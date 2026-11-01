@@ -444,7 +444,7 @@ function Game() {
         </header>
 
         <p className="goal-line mx-auto mb-4 max-w-2xl text-center text-xl">
-          <span className="font-pixel text-sm text-accent">GOAL ▸ </span>Fly the ship into the portal before the black hole takes it.
+          <span className="font-pixel text-sm text-accent"><span className="font-pixel text-sm text-accent">GOAL: ▸ </span>Fly the ship into the portal before the black hole takes it.Fly the ship into the portal before the black hole takes it.
         </p>
         <div className="mb-4 flex flex-wrap justify-center gap-2">
           {LEVELS.map((l, i) => (
