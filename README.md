@@ -4,7 +4,7 @@ A space puzzle game where you guide a drifting spaceship to an escape portal.
 
 ## 🎮 Play the Game
 
-**[▶ Play Project Escape](https://projectescape.lovable.app)**
+**[▶ Play Project Escape](https://project-escape.lovable.app/)**
 
 Play in your browser—no installation required.
 
