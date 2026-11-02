@@ -46,14 +46,16 @@ Finish **Gravity Well** to unlock the exit screen, where you can replay or retur
 
 ## Run the Game Locally
 
+
 You’ll need Node.js and npm.
 
 ```bash
-git clone https://github.com/anshulpatil2808-web/Project_Escape.git
-cd Project_Escape
+git clone https://github.com/Shravanp7/project_escape-8c1a610a.git
+cd project_escape-8c1a610a
 npm install
 npm run dev
 ```
+
 
 ## For Developers
 
