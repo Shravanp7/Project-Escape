@@ -5,7 +5,7 @@ import { ARTWORK } from "./artwork";
 
 export function ExitScreen({ onReplay, onExit }: { onReplay: () => void; onExit: () => void }) {
   return (
-    <section className="fixed inset-0 z-[60] flex flex-col items-center justify-center overflow-hidden bg-background px-6 text-center" aria-label="Escape complete">
+    <section className="fixed inset-0 z-[60] flex flex-col items-center justify-center-safe overflow-x-hidden overflow-y-auto bg-background px-6 py-20 text-center" aria-label="Escape complete">
       <Starfield />
       <div className="relative flex max-w-lg flex-col items-center gap-6">
         <p className="font-pixel text-xs text-accent">GRAVITY WELL CLEARED</p>
