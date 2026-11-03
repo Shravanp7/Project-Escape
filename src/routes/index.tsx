@@ -5,7 +5,7 @@ import { Starfield } from "@/game/Starfield";
 import { Button } from "@/components/ui/button";
 import { RotateCw, ArrowUp, ArrowRight, ArrowDown, ArrowLeft } from "lucide-react";
 import { drawDirectionalCell, drawCell } from "@/game/sprites";
-import { DIRS, DIR_NAMES, HORIZON_Y, LEVELS, MODS, SIZE, facesShip, makeDirs, makeGrid, refund, spinAttached, step, type Cell, type ModType, type Vec } from "@/game/engine";
+import { DIRS, DIR_NAMES, HORIZON_Y, LEVELS, MODS, SIZE, facesShip, thrusterPushes, makeDirs, makeGrid, refund, spinAttached, step, type Cell, type ModType, type Vec } from "@/game/engine";
 import { StartScreen } from "@/game/StartScreen";
 import { play } from "@/game/sound";
 import { BlackHole } from "@/game/BlackHole";
@@ -72,7 +72,7 @@ function predict(g: Cell[][], dirs: number[][], li: number, ship: Vec, vel: Vec)
   let s = ship, v = vel, d = dirs;
   for (let i = 0; i < 16; i++) {
     const r = step(g, d, level, s, v);
-    if (r.event === "held") break;
+    if (r.event === "held" || r.event === "stalled") break;
     path.push(r.ship);
     if (r.event !== "move" && r.event !== "blocked") break;
     s = r.ship; v = r.vel;
@@ -277,6 +277,16 @@ function Game() {
         c.strokeStyle = `rgba(127,240,255,${0.3 + 0.3 * Math.sin(t / 120)})`;
         c.strokeRect(ship[0] * TILE + 2.5, ship[1] * TILE + 2.5, 11, 11);
       }
+      // jammed thruster: touching the ship but facing the wrong way, so the ship is frozen
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        const jx = ship[0] + dx, jy = ship[1] + dy;
+        if (grid[jy]?.[jx] !== "thruster" || thrusterPushes(dirs, jx, jy, ship)) continue;
+        if (Math.floor(t / 200) % 2) continue;
+        c.strokeStyle = "#ff4d6d";
+        c.strokeRect(jx * TILE + 0.5, jy * TILE + 0.5, TILE - 1, TILE - 1);
+        c.fillStyle = "#ff4d6d";
+        for (let i = 3; i < 13; i += 2) { c.fillRect(jx * TILE + i, jy * TILE + i, 1, 1); c.fillRect(jx * TILE + 15 - i, jy * TILE + i, 1, 1); }
+      }
       // bumper / wall impact shockwave
       const im = impact.current;
       if (im) {
@@ -346,9 +356,10 @@ function Game() {
       const h = hover.current;
       const { tool: tl } = state.current;
       if (h && tl !== "erase" && !grid[h[1]]?.[h[0]] && h[1] < HORIZON_Y && !(h[0] === ship[0] && h[1] === ship[1])) {
-        // ghost preview of what a click will place (thrusters pre-aimed at the ship)
+        // ghost preview of what a click will place (thrusters pre-aimed with the flame away from the ship)
         c.globalAlpha = 0.4 + 0.15 * Math.sin(t / 150);
-        const d = ship[0] === h[0] ? (ship[1] > h[1] ? 2 : 0) : ship[1] === h[1] ? (ship[0] > h[0] ? 1 : 3) : 1;
+        const aim = ship[0] === h[0] ? (ship[1] > h[1] ? 2 : 0) : ship[1] === h[1] ? (ship[0] > h[0] ? 1 : 3) : 1;
+        const d = tl === "thruster" && (ship[0] === h[0] || ship[1] === h[1]) ? (aim + 2) % 4 : aim;
         if (tl === "thruster") drawThruster(c, h[0] * TILE, h[1] * TILE, d, t);
         else drawDirectionalCell(c, tl, h[0] * TILE, h[1] * TILE, t, d);
         c.globalAlpha = 1;
@@ -410,8 +421,9 @@ function Game() {
       popped.current.set(`${x},${y}`, performance.now());
       setSelected([x, y]);
       {
-        // aim at the ship by default if it sits in a straight line
-        const d = ship[0] === x ? (ship[1] > y ? 2 : 0) : ship[1] === y ? (ship[0] > x ? 1 : 3) : 1;
+        // aim at the ship by default if it sits in a straight line (thruster flames point away from it)
+        const aim = ship[0] === x ? (ship[1] > y ? 2 : 0) : ship[1] === y ? (ship[0] > x ? 1 : 3) : 1;
+        const d = tool === "thruster" && (ship[0] === x || ship[1] === y) ? (aim + 2) % 4 : aim;
         setDirs((ds) => ds.map((r, yy) => r.map((v, xx) => (xx === x && yy === y ? d : v))));
       }
       if (!sandbox) {
@@ -563,7 +575,7 @@ function Game() {
             <h2 className="font-pixel mb-2 mt-4 text-sm text-accent">HOW IT WORKS</h2>
             <ol className="space-y-1 text-xl text-muted-foreground">
               <li>1. Get the ship into the spinning portal.</li>
-              <li>2. A thruster next to the ship, lined up with it, pushes the ship away from it. Turn any module to change its active face.</li>
+              <li>2. A thruster touching the ship pushes it forward only when its flame points away from the ship. Facing any other way, it jams the ship in place (flashing red) until you turn it.</li>
               <li>3. Anchors hold only their facing square. Bumper fronts stop; their backs and sides bounce.</li>
               <li>4. No friction: once moving, the ship glides until it hits something.</li>
               <li>5. When the ship stops, the black hole pulls it down one square at a time.</li>
