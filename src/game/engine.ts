@@ -15,7 +15,7 @@ export const DIR_NAMES = ["UP", "RIGHT", "DOWN", "LEFT"];
 export const MODS: Record<ModType, { name: string; cost: number; desc: string }> = {
   thruster: { name: "Thruster", cost: 2, desc: "Touching the ship with its flame pointing away, it pushes the ship forward. Facing any other way, the ship can't move at all. Click it to turn it." },
   shield: { name: "Anchor", cost: 3, desc: "Its glowing face holds the ship in the square it points at." },
-  comms: { name: "Bumper", cost: 1, desc: "The padded face stops the ship; the other sides bounce it back." },
+  comms: { name: "Bumper", cost: 1, desc: "Its padded face bounces the ship back. If the ship hits any other side, it can't move at all until you turn the bumper." },
 };
 
 export const SIZE = 7;
@@ -34,7 +34,7 @@ export interface Level {
 
 // Every level is checked by a solver (engine.test.ts): budget must cover the cheapest solution.
 // Coins start at 6 and grow by 4 per mission; the clock starts at 30s and grows by 20s per mission.
-// Cheapest solver-found solutions cost 2 / 3 / 3 / 3 / 6 coins (thrusters must fire with their flame pointing away).
+// Cheapest solver-found solutions cost 2 / 3 / 3 / 3 / 6 coins (thrusters fire with flame away; bumpers bounce only off the pad).
 export const LEVELS: Level[] = [
   { name: "Training", brief: "Put a thruster on the left of the ship, then press Launch.", budget: 6, time: 30, ship: [1, 2], portal: [5, 2], rocks: [] },
   { name: "Cold Start", brief: "Only one route works. Plan your burns.", budget: 10, time: 50, ship: [5, 2], portal: [1, 3], rocks: [[0, 5], [1, 0], [6, 4], [4, 0], [5, 3]] },
@@ -102,8 +102,11 @@ export function step(g: Cell[][], dirs: number[][], level: Level, ship: Vec, vel
   const nx = sx + v[0], ny = sy + v[1];
   if (nx === level.portal[0] && ny === level.portal[1]) return { ship: [nx, ny], vel: v, event: "portal" };
   if (ny >= HORIZON_Y && nx >= 0 && nx < SIZE) return { ship: [nx, ny], vel: v, event: "blackhole" };
-  if (g[ny]?.[nx] === "comms" && !facesShip(dirs, nx, ny, ship)) {
-    return { ship, vel: [-v[0] || 0, -v[1] || 0], event: "blocked" };
+  // 6. Bumpers: hitting the padded face bounces the ship straight back. Hitting any other side jams it:
+  //    the ship keeps pressing into the bumper (so the black hole can't pull it) until the pad is turned to face it.
+  if (g[ny]?.[nx] === "comms") {
+    if (facesShip(dirs, nx, ny, ship)) return { ship, vel: [-v[0] || 0, -v[1] || 0], event: "blocked" };
+    return { ship, vel: v, event: "stalled" };
   }
   if (nx < 0 || nx >= SIZE || ny < 0 || g[ny]?.[nx]) return { ship, vel: [0, 0], event: "blocked" };
   return { ship: [nx, ny], vel: v, event: "move" };
