@@ -77,8 +77,7 @@ Project Escape is a space-themed puzzle game collaboratively conceptualized and 
 - [Node.js](https://nodejs.org/)
 - npm
   
-### <img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/ae5a9143-7394-4e8b-b903-5b0fd765c04c" />
- Installation
+### Installation
 
 Clone the repository, install the dependencies, and start the development server:
 
