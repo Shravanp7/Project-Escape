@@ -1,27 +1,39 @@
 # Project Escape 🚀
 
-A space puzzle game where you guide a drifting spaceship to an escape portal.
+An interactive space puzzle game where you guide a drifting spaceship through cosmic obstacles to reach an escape portal.
 
 ## 🎮 Play the Game
 
-**[▶ Play Project Escape](https://project-escape.lovable.app/)**
+[**▶ Play Project Escape**](https://project-escape.lovable.app/)
 
-Play in your browser—no installation required.
+Play directly in your browser — no installation required.
 
-## How to Play
+## ✨ Features
 
-1. Place modules on the board to guide the ship.
+- Five handcrafted puzzle missions with increasing difficulty.
+- Strategic module placement and rotation.
+- Physics-inspired movement and collision mechanics.
+- Credit-based resource management.
+- A countdown timer that adds challenge.
+- Tested solutions for every level.
+- A pixelated visual style with cosmic environments.
+
+## 🕹️ How to Play
+
+1. Place modules on the board to guide the spaceship.
 2. Click a module or use the arrow controls to rotate it. Rotating is free.
-3. Press **Launch**. The ship keeps moving until a module stops or changes its direction.
-4. Reach the portal before time or credits run out.
+3. Press **Launch**. The ship moves until a module stops it or changes its direction.
+4. Reach the portal before your time or credits run out.
 
-## Modules
+## 🧩 Modules
 
-- **Thruster:** Pushes a nearby ship when correctly aligned.
-- **Anchor:** Holds the ship in the square its glowing face points toward.
-- **Bumper:** Stops the ship on its padded side and reflects it from the other sides.
+| Module | Description |
+|---|---|
+| **Thruster** | Pushes a nearby ship when correctly aligned. |
+| **Anchor** | Holds the ship in the square its glowing face points toward. |
+| **Bumper** | Stops the ship on its padded side and reflects it from other sides. |
 
-## How You Lose
+## 💥 How You Lose
 
 The mission fails if:
 
@@ -30,9 +42,9 @@ The mission fails if:
 - You run out of credits during flight.
 - The timer reaches zero.
 
-Removing a module restores its full cost. After a failed mission, select **Try again** to restart.
+Removing a module restores its full cost. After a failed mission, select **Try Again** to restart.
 
-## Levels
+## 🌌 Levels
 
 Play through five missions:
 
@@ -42,12 +54,27 @@ Play through five missions:
 4. High Orbit
 5. Gravity Well
 
-Finish **Gravity Well** to unlock the exit screen, where you can replay or return to the launch screen. Every level has a tested solution within its credit budget.
+Complete **Gravity Well** to unlock the exit screen, where you can replay or return to the launch screen.
 
-## Run the Game Locally
+Every level has a tested solution within its credit budget.
 
+## 🛠️ Tech Stack
 
-You’ll need Node.js and npm.
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Vitest
+- Lovable
+
+## 💻 Run the Game Locally
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/)
+- npm
+
+### Installation
 
 ```bash
 git clone https://github.com/Shravanp7/project_escape-8c1a610a.git
@@ -56,16 +83,39 @@ npm install
 npm run dev
 ```
 
+Open the local URL displayed in your terminal.
 
-## For Developers
+## 🧪 Testing
 
-- Game rules: `src/game/engine.ts`
-- Engine tests: `src/game/engine.test.ts`
-- Run tests: `bunx vitest run`
-- Visual effects use small canvases scaled up for a pixelated look.
+Run the game engine tests using:
 
-## Credits
+```bash
+bunx vitest run
+```
+
+## 📁 Project Structure
+
+```text
+src/
+├── game/
+│   ├── engine.ts
+│   ├── engine.test.ts
+│   └── ...
+├── components/
+├── routes/
+└── ...
+```
+
+- `src/game/engine.ts` — Game rules and mechanics.
+- `src/game/engine.test.ts` — Game engine tests.
+
+## 🎨 Visual Design
+
+Visual effects use small canvases scaled up to create a pixelated aesthetic.
+
+## 👥 Credits
 
 Created by **Shravan Patil and Anshul Patil** for **Pixathon**, with the theme *“Any puzzle, your rules.”*
 
 Built with [Lovable](https://lovable.dev).
+
