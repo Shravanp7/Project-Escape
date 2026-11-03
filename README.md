@@ -88,33 +88,15 @@ git clone https://github.com/Shravanp7/project_escape-8c1a610a.git
 cd project_escape-8c1a610a
 npm install
 npm run dev
-```
 
-Open the local URL displayed in your terminal.
+This makes the commands readable and lets someone copy them into their terminal.
 
-## 🧪 Testing
+### 2. Check the test command
 
-Run the game engine tests using:
+Your README says:
 
 ```bash
 bunx vitest run
-```
-
-## 📁 Project Structure
-
-```text
-src/
-├── game/
-│   ├── engine.ts
-│   ├── engine.test.ts
-│   └── ...
-├── components/
-├── routes/
-└── ...
-```
-
-- `src/game/engine.ts` — Game rules and mechanics.
-- `src/game/engine.test.ts` — Game engine tests.
 
 ## 🎨 Visual Design
 
