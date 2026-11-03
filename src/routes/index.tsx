@@ -277,13 +277,15 @@ function Game() {
         c.strokeStyle = `rgba(127,240,255,${0.3 + 0.3 * Math.sin(t / 120)})`;
         c.strokeRect(ship[0] * TILE + 2.5, ship[1] * TILE + 2.5, 11, 11);
       }
-      // jammed thruster or bumper: facing the wrong way, so the ship is frozen
+      // jammed thruster, bumper or anchor: facing the wrong way, so the ship is frozen
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
         const jx = ship[0] + dx, jy = ship[1] + dy;
         const jammedThruster = grid[jy]?.[jx] === "thruster" && !thrusterPushes(dirs, jx, jy, ship);
         // a bumper is jammed when the ship is pressing into its unpadded side
         const jammedBumper = grid[jy]?.[jx] === "comms" && vel[0] === dx && vel[1] === dy && !facesShip(dirs, jx, jy, ship);
-        if (!jammedThruster && !jammedBumper) continue;
+        // an anchor pointing straight away from the ship would shove it into itself, so it jams
+        const jammedAnchor = grid[jy]?.[jx] === "shield" && DIRS[dirs[jy]?.[jx] ?? 1]?.[0] === dx && DIRS[dirs[jy]?.[jx] ?? 1]?.[1] === dy;
+        if (!jammedThruster && !jammedBumper && !jammedAnchor) continue;
         if (Math.floor(t / 200) % 2) continue;
         c.strokeStyle = "#ff4d6d";
         c.strokeRect(jx * TILE + 0.5, jy * TILE + 0.5, TILE - 1, TILE - 1);
@@ -579,7 +581,7 @@ function Game() {
             <ol className="space-y-1 text-xl text-muted-foreground">
               <li>1. Get the ship into the spinning portal.</li>
               <li>2. A thruster touching the ship pushes it forward only when its flame points away from the ship. Facing any other way, it jams the ship in place (flashing red) until you turn it.</li>
-              <li>3. Anchors hold only their facing square. A bumper's padded face bounces the ship back; if the ship hits any other side, it jams in place (flashing red) until you turn the bumper.</li>
+              <li>3. An anchor facing the ship holds it still; facing any other way, it shoves the ship one square the way it points. A bumper's padded face bounces the ship back; if the ship hits any other side, it jams in place (flashing red) until you turn the bumper.</li>
               <li>4. No friction: once moving, the ship glides until it hits something.</li>
               <li>5. When the ship stops, the black hole pulls it down one square at a time.</li>
               <li>6. If it falls into the purple bottom row, it's gone.</li>

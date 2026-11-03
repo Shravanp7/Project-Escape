@@ -36,6 +36,19 @@ describe("drift rules", () => {
     expect(step(g, d, LEVELS[0]!, [3 + vector[0], 3 + vector[1]], [1, 0]).event).toBe("held");
     expect(step(g, d, LEVELS[0]!, [3 - vector[0], 3 - vector[1]], [1, 0]).event).not.toBe("held");
   });
+  it("a sideways anchor shoves the ship one square the way it points, then the ship stops", () => {
+    const { g, d } = build(0, [[3, 4, "shield", 1]]); // below the ship, pointing right
+    const r = step(g, d, LEVELS[0]!, [3, 3], [0, 0]);
+    expect(r.event).toBe("move");
+    expect(r.ship).toEqual([4, 3]);
+    expect(r.vel).toEqual([0, 0]);
+  });
+  it("an anchor pointing straight away from the ship jams it instead of letting it fall", () => {
+    const { g, d } = build(0, [[3, 4, "shield", 2]]); // below the ship, pointing down
+    const r = step(g, d, LEVELS[0]!, [3, 3], [0, 0]);
+    expect(r.event).toBe("stalled");
+    expect(r.ship).toEqual([3, 3]);
+  });
   it.each([0, 1, 2, 3])("bumper direction %i bounces the ship off its padded face", (dir) => {
     const [dx, dy] = [[0, -1], [1, 0], [0, 1], [-1, 0]][dir]!;
     const { g, d } = build(0, [[3, 3, "comms", dir]]);
