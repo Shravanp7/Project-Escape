@@ -14,7 +14,7 @@ export const DIR_NAMES = ["UP", "RIGHT", "DOWN", "LEFT"];
 
 export const MODS: Record<ModType, { name: string; cost: number; desc: string }> = {
   thruster: { name: "Thruster", cost: 2, desc: "Touching the ship with its flame pointing away, it pushes the ship forward. Facing any other way, the ship can't move at all. Click it to turn it." },
-  shield: { name: "Anchor", cost: 3, desc: "Its glowing face holds the ship in the square it points at." },
+  shield: { name: "Anchor", cost: 3, desc: "Glowing face toward the ship: it holds the ship still. Facing any other way, it shoves the ship one square the way it points." },
   comms: { name: "Bumper", cost: 1, desc: "Its padded face bounces the ship back. If the ship hits any other side, it can't move at all until you turn the bumper." },
 };
 
@@ -34,7 +34,7 @@ export interface Level {
 
 // Every level is checked by a solver (engine.test.ts): budget must cover the cheapest solution.
 // Coins start at 6 and grow by 4 per mission; the clock starts at 30s and grows by 20s per mission.
-// Cheapest solver-found solutions cost 2 / 3 / 3 / 3 / 6 coins (thrusters fire with flame away; bumpers bounce only off the pad).
+// Cheapest solver-found solutions cost 2 / 3 / 3 / 3 / 6 coins (thrusters fire with flame away; bumpers bounce only off the pad; wrong-facing anchors shove).
 export const LEVELS: Level[] = [
   { name: "Training", brief: "Put a thruster on the left of the ship, then press Launch.", budget: 6, time: 30, ship: [1, 2], portal: [5, 2], rocks: [] },
   { name: "Cold Start", brief: "Only one route works. Plan your burns.", budget: 10, time: 50, ship: [5, 2], portal: [1, 3], rocks: [[0, 5], [1, 0], [6, 4], [4, 0], [5, 3]] },
@@ -95,13 +95,24 @@ export function step(g: Cell[][], dirs: number[][], level: Level, ship: Vec, vel
   const thrusters = adj.filter((n) => n.c === "thruster");
   if (thrusters.some((n) => !thrusterPushes(dirs, n.x, n.y, ship))) return { ship, vel: [0, 0], event: "stalled" };
   if (thrusters.length) v = thrusters.reduce<Vec>((a, n) => [a[0] + (sx - n.x), a[1] + (sy - n.y)], [0, 0]);
-  // 4. Not moving at all? The black hole pulls it down
+  // 4. A touching anchor facing the wrong way shoves the ship one square the way it points, then the ship stops.
+  //    Pointing straight away from the ship it would shove the ship into itself, so the ship is jammed instead.
+  const anchor = thrusters.length ? undefined : adj.find((n) => n.c === "shield");
+  let shoved = false;
+  if (anchor) {
+    const push = DIRS[dirs[anchor.y]?.[anchor.x] ?? 1]!;
+    if (anchor.x - sx === push[0] && anchor.y - sy === push[1]) return { ship, vel: [0, 0], event: "stalled" };
+    v = push; shoved = true;
+  }
+  // 5. Not moving at all? The black hole pulls it down
   if (v[0] === 0 && v[1] === 0) v = [0, 1];
   v = Math.abs(v[0]) > Math.abs(v[1]) ? [Math.sign(v[0]), 0] : [0, Math.sign(v[1])];
 
   const nx = sx + v[0], ny = sy + v[1];
   if (nx === level.portal[0] && ny === level.portal[1]) return { ship: [nx, ny], vel: v, event: "portal" };
   if (ny >= HORIZON_Y && nx >= 0 && nx < SIZE) return { ship: [nx, ny], vel: v, event: "blackhole" };
+  // A shove that runs into anything (wall, rock, module) just jams the ship against it.
+  if (shoved && (nx < 0 || nx >= SIZE || ny < 0 || g[ny]?.[nx])) return { ship, vel: [0, 0], event: "stalled" };
   // 6. Bumpers: hitting the padded face bounces the ship straight back. Hitting any other side jams it:
   //    the ship keeps pressing into the bumper (so the black hole can't pull it) until the pad is turned to face it.
   if (g[ny]?.[nx] === "comms") {
@@ -109,7 +120,7 @@ export function step(g: Cell[][], dirs: number[][], level: Level, ship: Vec, vel
     return { ship, vel: v, event: "stalled" };
   }
   if (nx < 0 || nx >= SIZE || ny < 0 || g[ny]?.[nx]) return { ship, vel: [0, 0], event: "blocked" };
-  return { ship: [nx, ny], vel: v, event: "move" };
+  return { ship: [nx, ny], vel: shoved ? [0, 0] : v, event: "move" };
 }
 
 /** Run a full flight with no mid-flight changes. */
