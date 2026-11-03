@@ -34,7 +34,7 @@ export interface Level {
 
 // Every level is checked by a solver (engine.test.ts): budget must cover the cheapest solution.
 // Coins start at 6 and grow by 4 per mission; the clock starts at 30s and grows by 20s per mission.
-// Brute-forced cheapest solutions cost 2 / 3 / 3 / 3 / 5 coins and take 4 / 6 / 5 / 8 / 10 ticks.
+// Cheapest solver-found solutions cost 2 / 3 / 3 / 3 / 6 coins (thrusters must fire with their flame pointing away).
 export const LEVELS: Level[] = [
   { name: "Training", brief: "Put a thruster on the left of the ship, then press Launch.", budget: 6, time: 30, ship: [1, 2], portal: [5, 2], rocks: [] },
   { name: "Cold Start", brief: "Only one route works. Plan your burns.", budget: 10, time: 50, ship: [5, 2], portal: [1, 3], rocks: [[0, 5], [1, 0], [6, 4], [4, 0], [5, 3]] },

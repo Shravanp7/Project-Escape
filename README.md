@@ -29,7 +29,7 @@ Play directly in your browser — no installation required.
 
 | Module | Description |
 |---|---|
-| **Thruster** | Pushes a nearby ship when correctly aligned. |
+| **Thruster** | Touching the ship with its flame pointing away, it pushes the ship forward. Facing any other way, the ship freezes in place. |
 | **Anchor** | Holds the ship in the square its glowing face points toward. |
 | **Bumper** | Stops the ship on its padded side and reflects it from other sides. |
 
