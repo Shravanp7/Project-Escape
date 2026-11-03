@@ -19,3 +19,4 @@
 - Screen transitions lock editing/navigation and own cancellable timers; white-hole emergence includes background and footer. Why: avoids stale level changes and disconnected screen fragments.
 - Levels are validated in engine.test.ts by simulating a recorded solution; each budget must be at least the cheapest solution's cost. Budgets follow the user's progression (2 coins on Training, +3 per mission) and may exceed the cheapest solution. Why: guarantees hard levels stay solvable while coins escalate as the user wants.
 - Full-screen overlays (start, loss, exit) scroll internally with safe centering instead of clipping. Why: short laptop windows must never cut off their content.
+- On md+ screens at least 500px tall the game screen fits one window (no page scroll): the board is sized from measured row height on resize only, and panel text scales down via --fs until panels fit. Why: users must see everything without scrolling, and the board must not jump mid-flight.

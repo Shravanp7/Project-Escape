@@ -106,6 +106,35 @@ function Game() {
   const warp = useRef<{ at: number; kind: "out" | "in" } | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const page = useRef<HTMLDivElement>(null);
+  // one-screen layout: the board takes whatever height is left in its column,
+  // and panel text shrinks only as far as needed so every line stays visible
+  const boardSlot = useRef<HTMLDivElement>(null);
+  const fitScreen = useRef<() => void>(() => {});
+  useEffect(() => {
+    const slot = boardSlot.current;
+    if (!slot) return;
+    const host = slot.closest<HTMLElement>(".fit-grid");
+    if (!host) return;
+    // board height = grid row minus the clock row and launch row; measured on resize only so the board never jumps mid-flight
+    const fit = () => {
+      const top = host.querySelector<HTMLElement>(".fit-board-top")?.offsetHeight ?? 0;
+      const controls = host.querySelector<HTMLElement>(".fit-controls")?.offsetHeight ?? 0;
+      host.style.setProperty("--board-max", `${Math.max(160, Math.floor(host.clientHeight - top - controls - 20))}px`);
+      const panels = [...host.querySelectorAll<HTMLElement>(".fit-panel")];
+      let fs = 1;
+      host.style.setProperty("--fs", "1");
+      while (fs > 0.6 && panels.some((p) => p.scrollHeight > p.clientHeight + 1)) {
+        fs -= 0.025;
+        host.style.setProperty("--fs", fs.toFixed(3));
+      }
+    };
+    fitScreen.current = fit;
+    const ro = new ResizeObserver(fit);
+    ro.observe(host);
+    fit();
+    return () => ro.disconnect();
+  }, []);
+  useEffect(() => { fitScreen.current(); }, [li, selected, sandbox]);
   const [portalFx, setPortalFx] = useState<{ kind: "enter" | "hidden" | "exit"; origin: string } | null>(null);
   const [tunnel, setTunnel] = useState(false);
   // where a grid cell sits inside the page wrapper, used as the warp's vanishing point
@@ -430,23 +459,23 @@ function Game() {
   };
 
   return (
-    <main className="relative min-h-screen px-3 py-4 text-foreground lg:px-6">
+    <main className="fit-screen relative min-h-screen px-3 py-4 text-foreground lg:px-6">
       {tunnel && <WarpTunnel duration={1950} />}
       <div
         ref={page}
         style={portalFx ? { transformOrigin: portalFx.origin } : undefined}
-        className={`mx-auto max-w-[1700px] ${lost ? "page-sucked" : emerging ? "page-emerge" : portalFx ? `page-portal-${portalFx.kind}` : ""}`}
+        className={`fit-page mx-auto max-w-[1700px] ${lost ? "page-sucked" : emerging ? "page-emerge" : portalFx ? `page-portal-${portalFx.kind}` : ""}`}
       >
         <Starfield />
-        <header className="mb-3 text-center">
+        <header className="fit-header mb-3 text-center">
           <h1 className="title-glitch font-pixel text-xl text-primary md:text-3xl">PROJECT ESCAPE</h1>
           <p className="mt-2 text-xl text-muted-foreground">Your ship has no brakes. The black hole is hungry. Steer it home.</p>
         </header>
 
-        <p className="goal-line mx-auto mb-4 max-w-2xl text-center text-xl">
+        <p className="goal-line fit-gap mx-auto mb-4 max-w-2xl text-center text-xl">
           <span className="font-pixel text-base text-accent">GOAL:</span>{" "}Fly the ship into the portal before the black hole takes it.
         </p>
-        <div className="mb-4 flex flex-wrap justify-center gap-2">
+        <div className="fit-gap mb-4 flex flex-wrap justify-center gap-2">
           {LEVELS.map((l, i) => (
             <Button variant="pixel" key={l.name} disabled={locked || i > unlocked} onClick={() => loadLevel(i)} className={`pixel-btn ${i === li ? "pixel-btn-active" : ""}`}>
               {i + 1}. {l.name}{i > unlocked ? " · LOCKED" : ""}
@@ -454,8 +483,8 @@ function Game() {
           ))}
         </div>
 
-        <div className="grid gap-6 md:grid-cols-[minmax(220px,1fr)_auto_minmax(220px,1fr)] lg:gap-8">
-          <aside className="pixel-panel float-in order-2 md:order-1">
+        <div className="fit-grid grid gap-6 md:grid-cols-[minmax(220px,1fr)_auto_minmax(220px,1fr)] lg:gap-8">
+          <aside className="fit-panel pixel-panel float-in order-2 md:order-1">
             <h2 className="font-pixel mb-3 text-sm text-accent">MODULES</h2>
             <div className="grid gap-2">
               {TYPES.map((t) => (
@@ -483,10 +512,13 @@ function Game() {
           </aside>
 
           <div className="board-column order-1 flex flex-col items-center md:order-2">
+            <div className="fit-board-top w-full">
             <div className="mb-3 flex w-full justify-between font-pixel text-sm">
               <span className={!sandbox && timeLeft <= 5 ? "timer-danger" : "text-accent"}>{sandbox ? "NO CLOCK" : `T-${Math.max(0, timeLeft)}s`}</span>
               <span className="text-primary">{sandbox ? "¢∞" : `¢${wallet}`}</span>
             </div>
+            </div>
+            <div ref={boardSlot} className="board-slot flex w-full justify-center">
             <div className="board-wrap tactical">
               <span className="hud-tag hud-tl">SECTOR {String(li + 1).padStart(2, "0")}</span>
               <span className="hud-tag hud-tr">{flying ? "IN FLIGHT" : won ? "WARP" : "STANDBY"}</span>
@@ -514,17 +546,18 @@ function Game() {
                 }}
               />
             </div>
-            <div className="mt-3 flex w-full gap-2">
+            </div>
+            <div className="fit-controls mt-3 flex w-full gap-2">
               {!flying && !won && (
                 <Button variant="pixel" onClick={launch} className="pixel-btn pixel-btn-active flex-1 font-pixel text-sm">▶ LAUNCH</Button>
               )}
               {flying && <p className="flex-1 text-center text-lg text-accent">Ship is moving — you can still place modules.</p>}
               <Button variant="pixel" disabled={locked} onClick={() => loadLevel(li)} className="pixel-btn">Restart</Button>
             </div>
-            <p className="mt-2 text-center text-lg text-muted-foreground">Yellow dots show the ship’s path · Click any module to turn it · Right-click a module to remove it</p>
+            <p className="mt-2 md:hidden text-center text-lg text-muted-foreground">Yellow dots show the ship’s path · Click any module to turn it · Right-click a module to remove it</p>
           </div>
 
-          <aside className="pixel-panel float-in order-3">
+          <aside className="fit-panel pixel-panel float-in order-3">
             <h2 className="font-pixel mb-2 text-sm text-accent">MISSION</h2>
             <p className="text-xl">{level.brief}</p>
             <h2 className="font-pixel mb-2 mt-4 text-sm text-accent">HOW IT WORKS</h2>
@@ -540,7 +573,8 @@ function Game() {
             </ol>
           </aside>
         </div>
-        <footer className="relative mt-10 text-center text-lg text-muted-foreground">Made by Shravan Patil and Anshul Patil</footer>
+        <p className="fit-hint mt-3 hidden md:block text-center text-lg text-muted-foreground">Yellow dots show the ship’s path · Click any module to turn it · Right-click a module to remove it</p>
+        <footer className="fit-footer relative mt-10 text-center text-lg text-muted-foreground">Made by Shravan Patil and Anshul Patil</footer>
       </div>
       {won && li < LEVELS.length - 1 && <p className="warp-banner font-pixel">SECTOR CLEAR · WARPING…</p>}
       {!started && <StartScreen onStart={() => { setStarted(true); setEmerging(true); }} />}
