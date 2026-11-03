@@ -55,8 +55,11 @@ Play through five missions:
 5. Gravity Well
 
 Complete **Gravity Well** to unlock the exit screen, where you can replay or return to the launch screen.
-
 Every level has a tested solution within its credit budget.
+
+##  About the Project:
+
+Project Escape is a space-themed puzzle game collaboratively conceptualized and developed using Lovable, where players guide a drifting spaceship toward an escape portal by arranging in-game modules. We worked together to enhance the gameplay experience by redesigning in-game items with pixelated visuals, increasing the difficulty of puzzle levels, adding sound effects, and improving the visual effects of falling into the void. I also maintained my personal GitHub repository and updated its documentation, making the project easier to explore and showcase.
 
 ## 🛠️ Tech Stack
 
