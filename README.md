@@ -76,17 +76,16 @@ Project Escape is a space-themed puzzle game collaboratively conceptualized and 
 
 - [Node.js](https://nodejs.org/)
 - npm
-
+  
 ### Installation
 
-Clone the repository and install the dependencies:
+Clone the repository, install the dependencies, and start the development server:
 
 ```bash
 git clone https://github.com/Shravanp7/project_escape-8c1a610a.git
 cd project_escape-8c1a610a
 npm install
 npm run dev
-```
 
 Open the local URL displayed in your terminal.
 
