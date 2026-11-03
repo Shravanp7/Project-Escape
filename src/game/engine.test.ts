@@ -56,7 +56,7 @@ describe("drift rules", () => {
     const away = build(1, [[6, 2, "thruster", 1]]);
     expect(step(away.g, away.d, LEVELS[1]!, [5, 2], [0, 0]).ship).toEqual([4, 2]);
   });
-  it.each([0, 2, 3])("a touching thruster facing direction %i freezes the ship in place", (dir) => {
+  it.each([0, 1, 2])("a touching thruster facing direction %i freezes the ship in place", (dir) => {
     const { g, d } = build(0, [[0, 2, "thruster", dir]]);
     const r = step(g, d, LEVELS[0]!, [1, 2], [1, 0]);
     expect(r.event).toBe("stalled");
