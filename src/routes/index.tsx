@@ -106,8 +106,10 @@ function Game() {
   const warp = useRef<{ at: number; kind: "out" | "in" } | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const page = useRef<HTMLDivElement>(null);
-  // one-screen layout: the board takes whatever height is left in its column
+  // one-screen layout: the board takes whatever height is left in its column,
+  // and panel text shrinks only as far as needed so every line stays visible
   const boardSlot = useRef<HTMLDivElement>(null);
+  const fitScreen = useRef<() => void>(() => {});
   useEffect(() => {
     const slot = boardSlot.current;
     if (!slot) return;
@@ -118,12 +120,21 @@ function Game() {
       const top = host.querySelector<HTMLElement>(".fit-board-top")?.offsetHeight ?? 0;
       const controls = host.querySelector<HTMLElement>(".fit-controls")?.offsetHeight ?? 0;
       host.style.setProperty("--board-max", `${Math.max(160, Math.floor(host.clientHeight - top - controls - 20))}px`);
+      const panels = [...host.querySelectorAll<HTMLElement>(".fit-panel")];
+      let fs = 1;
+      host.style.setProperty("--fs", "1");
+      while (fs > 0.6 && panels.some((p) => p.scrollHeight > p.clientHeight + 1)) {
+        fs -= 0.025;
+        host.style.setProperty("--fs", fs.toFixed(3));
+      }
     };
+    fitScreen.current = fit;
     const ro = new ResizeObserver(fit);
     ro.observe(host);
     fit();
     return () => ro.disconnect();
   }, []);
+  useEffect(() => { fitScreen.current(); }, [li, selected, sandbox]);
   const [portalFx, setPortalFx] = useState<{ kind: "enter" | "hidden" | "exit"; origin: string } | null>(null);
   const [tunnel, setTunnel] = useState(false);
   // where a grid cell sits inside the page wrapper, used as the warp's vanishing point
