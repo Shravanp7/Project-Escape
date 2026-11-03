@@ -10,11 +10,11 @@ const build = (li: number, mods: Mod[]) => {
 
 /** Solver-verified cheapest solutions (brute force over every placement). */
 const SOLUTIONS: Mod[][] = [
-  [[0, 2, "thruster", 1]],
+  [[0, 2, "thruster", 3]],
   [[0, 2, "comms", 1], [6, 2, "thruster", 1]],
-  [[1, 3, "thruster", 1], [2, 5, "comms", 1]],
-  [[0, 0, "thruster", 1], [1, 4, "comms", 1]],
-  [[5, 1, "thruster", 1], [2, 2, "thruster", 1], [4, 5, "comms", 1]],
+  [[1, 3, "thruster", 3], [2, 5, "comms", 1]],
+  [[0, 0, "thruster", 3], [1, 4, "comms", 1]],
+  [[4, 5, "comms", 1], [5, 0, "thruster", 1], [0, 0, "comms", 1], [2, 2, "thruster", 1]],
 ];
 const costOf = (mods: Mod[]) => mods.reduce((s, m) => s + MODS[m[2] as ModType].cost, 0);
 
@@ -52,13 +52,20 @@ describe("drift rules", () => {
     const { g, d } = build(2, []);
     expect(simulate(g, d, LEVELS[2]!)).toBe("blackhole");
   });
-  it("a lined-up thruster pushes the ship forward either way; sideways does nothing", () => {
-    const facing = build(1, [[6, 2, "thruster", 3]]);
-    expect(step(facing.g, facing.d, LEVELS[1]!, [5, 2], [0, 0]).ship).toEqual([4, 2]);
+  it("a thruster with its flame pointing away from the ship pushes it forward", () => {
     const away = build(1, [[6, 2, "thruster", 1]]);
     expect(step(away.g, away.d, LEVELS[1]!, [5, 2], [0, 0]).ship).toEqual([4, 2]);
-    const side = build(1, [[6, 2, "thruster", 0]]);
-    expect(step(side.g, side.d, LEVELS[1]!, [5, 2], [0, 0]).event).toBe("blocked"); // falls onto rock below
+  });
+  it.each([0, 1, 2])("a touching thruster facing direction %i freezes the ship in place", (dir) => {
+    const { g, d } = build(0, [[0, 2, "thruster", dir]]);
+    const r = step(g, d, LEVELS[0]!, [1, 2], [1, 0]);
+    expect(r.event).toBe("stalled");
+    expect(r.ship).toEqual([1, 2]);
+    expect(r.vel).toEqual([0, 0]);
+  });
+  it("a wrongly facing thruster stops the black hole pulling the ship down", () => {
+    const { g, d } = build(0, [[0, 2, "thruster", 0]]);
+    expect(simulate(g, d, LEVELS[0]!)).toBe("stuck");
   });
   it("three modules touching the ship overload it", () => {
     const { g, d } = build(1, [[6, 2, "comms", 1], [4, 2, "comms", 1], [5, 1, "comms", 1]]);
@@ -78,7 +85,7 @@ describe("drift rules", () => {
     });
   });
   it("recorded solutions cost exactly the cheapest the solver found", () => {
-    expect(SOLUTIONS.map(costOf)).toEqual([2, 3, 3, 3, 5]);
+    expect(SOLUTIONS.map(costOf)).toEqual([2, 3, 3, 3, 6]);
   });
   it("a thruster clipped onto a bumper turns it one step clockwise", () => {
     const { g, d } = build(0, [[3, 3, "comms", 0], [4, 3, "thruster", 1]]);

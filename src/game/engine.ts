@@ -13,7 +13,7 @@ export const DIRS: Vec[] = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 export const DIR_NAMES = ["UP", "RIGHT", "DOWN", "LEFT"];
 
 export const MODS: Record<ModType, { name: string; cost: number; desc: string }> = {
-  thruster: { name: "Thruster", cost: 2, desc: "Place it next to the ship, in line with it, to push the ship away. Click it to turn it." },
+  thruster: { name: "Thruster", cost: 2, desc: "Touching the ship with its flame pointing away, it pushes the ship forward. Facing any other way, the ship can't move at all. Click it to turn it." },
   shield: { name: "Anchor", cost: 3, desc: "Its glowing face holds the ship in the square it points at." },
   comms: { name: "Bumper", cost: 1, desc: "The padded face stops the ship; the other sides bounce it back." },
 };
@@ -34,7 +34,7 @@ export interface Level {
 
 // Every level is checked by a solver (engine.test.ts): budget must cover the cheapest solution.
 // Coins start at 6 and grow by 4 per mission; the clock starts at 30s and grows by 20s per mission.
-// Brute-forced cheapest solutions cost 2 / 3 / 3 / 3 / 5 coins and take 4 / 6 / 5 / 8 / 10 ticks.
+// Cheapest solver-found solutions cost 2 / 3 / 3 / 3 / 6 coins (thrusters must fire with their flame pointing away).
 export const LEVELS: Level[] = [
   { name: "Training", brief: "Put a thruster on the left of the ship, then press Launch.", budget: 6, time: 30, ship: [1, 2], portal: [5, 2], rocks: [] },
   { name: "Cold Start", brief: "Only one route works. Plan your burns.", budget: 10, time: 50, ship: [5, 2], portal: [1, 3], rocks: [[0, 5], [1, 0], [6, 4], [4, 0], [5, 3]] },
@@ -72,7 +72,13 @@ export function spinAttached(g: Cell[][], dirs: number[][]): number[][] {
   return next;
 }
 
-export type StepResult = { ship: Vec; vel: Vec; event: "move" | "blocked" | "held" | "portal" | "blackhole" | "overload" };
+/** A thruster's direction is where its flame points; it pushes only when the flame points away from the ship. */
+export function thrusterPushes(dirs: number[][], x: number, y: number, ship: Vec) {
+  const flame = DIRS[dirs[y]?.[x] ?? 1];
+  return !!flame && x - ship[0] === flame[0] && y - ship[1] === flame[1];
+}
+
+export type StepResult = { ship: Vec; vel: Vec; event: "move" | "blocked" | "held" | "stalled" | "portal" | "blackhole" | "overload" };
 
 /** One tick of the simulation. Rules are applied in this order. */
 export function step(g: Cell[][], dirs: number[][], level: Level, ship: Vec, vel: Vec): StepResult {
@@ -84,15 +90,11 @@ export function step(g: Cell[][], dirs: number[][], level: Level, ship: Vec, vel
   if (adj.some((n) => n.c === "shield" && facesShip(dirs, n.x, n.y, ship))) return { ship, vel: [0, 0], event: "held" };
 
   let v: Vec = vel;
-  // 3. Thrusters lined up with the ship (blast toward it, or exhaust pointing away like an engine)
-  //    push it forward, away from the thruster. Sideways thrusters do nothing.
-  const firing = adj.filter((n) => {
-    if (n.c !== "thruster") return false;
-    const [dx, dy] = DIRS[dirs[n.y]![n.x]!]!;
-    const ax = sx - n.x, ay = sy - n.y;
-    return (dx === ax && dy === ay) || (dx === -ax && dy === -ay);
-  });
-  if (firing.length) v = firing.reduce<Vec>((a, n) => [a[0] + (sx - n.x), a[1] + (sy - n.y)], [0, 0]);
+  // 3. A touching thruster must have its flame pointing straight away from the ship, like an engine.
+  //    Facing any other way it jams the ship in place: no drift, no black-hole pull, until it is turned.
+  const thrusters = adj.filter((n) => n.c === "thruster");
+  if (thrusters.some((n) => !thrusterPushes(dirs, n.x, n.y, ship))) return { ship, vel: [0, 0], event: "stalled" };
+  if (thrusters.length) v = thrusters.reduce<Vec>((a, n) => [a[0] + (sx - n.x), a[1] + (sy - n.y)], [0, 0]);
   // 4. Not moving at all? The black hole pulls it down
   if (v[0] === 0 && v[1] === 0) v = [0, 1];
   v = Math.abs(v[0]) > Math.abs(v[1]) ? [Math.sign(v[0]), 0] : [0, Math.sign(v[1])];
@@ -113,7 +115,7 @@ export function simulate(g: Cell[][], dirs: number[][], level: Level, max = 60) 
   for (let i = 0; i < max; i++) {
     const r = step(g, d, level, s, v);
     if (r.event === "portal" || r.event === "blackhole" || r.event === "overload") return r.event;
-    if (r.event === "held") return "stuck";
+    if (r.event === "held" || r.event === "stalled") return "stuck";
     s = r.ship; v = r.vel;
     d = spinAttached(g, d);
   }
