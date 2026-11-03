@@ -292,6 +292,7 @@
   .fit-board-top > div { margin-bottom: .5rem; }
   .board-column .board-wrap { width: min(100%, var(--board-max, 60vh), 788px); }
   .fit-controls { margin-top: .5rem; }
+  .fit-controls .font-pixel { white-space: nowrap; }
   .fit-hint { margin-top: .3rem; }
   .fit-footer { margin-top: .35rem; }
 }
