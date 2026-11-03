@@ -106,6 +106,17 @@ function Game() {
   const warp = useRef<{ at: number; kind: "out" | "in" } | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const page = useRef<HTMLDivElement>(null);
+  // one-screen layout: the board takes whatever height is left in its column
+  const boardSlot = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const slot = boardSlot.current;
+    if (!slot) return;
+    const fit = () => slot.style.setProperty("--board-max", `${Math.floor(slot.clientHeight)}px`);
+    const ro = new ResizeObserver(fit);
+    ro.observe(slot);
+    fit();
+    return () => ro.disconnect();
+  }, []);
   const [portalFx, setPortalFx] = useState<{ kind: "enter" | "hidden" | "exit"; origin: string } | null>(null);
   const [tunnel, setTunnel] = useState(false);
   // where a grid cell sits inside the page wrapper, used as the warp's vanishing point
