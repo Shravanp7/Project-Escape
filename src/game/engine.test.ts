@@ -11,10 +11,10 @@ const build = (li: number, mods: Mod[]) => {
 /** Solver-verified cheapest solutions (brute force over every placement). */
 const SOLUTIONS: Mod[][] = [
   [[0, 2, "thruster", 3]],
-  [[0, 2, "comms", 1], [6, 2, "thruster", 1]],
-  [[1, 3, "thruster", 3], [2, 5, "comms", 1]],
-  [[0, 0, "thruster", 3], [1, 4, "comms", 1]],
-  [[4, 5, "comms", 1], [5, 0, "thruster", 1], [0, 0, "comms", 1], [2, 2, "thruster", 1]],
+  [[6, 2, "thruster", 1], [1, 1, "thruster", 0]],
+  [[2, 5, "comms", 0], [1, 3, "thruster", 3]],
+  [[0, 4, "thruster", 3], [5, 5, "comms", 0]],
+  [[4, 5, "comms", 0], [5, 1, "thruster", 1], [2, 3, "thruster", 1], [0, 5, "comms", 0]],
 ];
 const costOf = (mods: Mod[]) => mods.reduce((s, m) => s + MODS[m[2] as ModType].cost, 0);
 
@@ -36,17 +36,32 @@ describe("drift rules", () => {
     expect(step(g, d, LEVELS[0]!, [3 + vector[0], 3 + vector[1]], [1, 0]).event).toBe("held");
     expect(step(g, d, LEVELS[0]!, [3 - vector[0], 3 - vector[1]], [1, 0]).event).not.toBe("held");
   });
-  it.each([0, 1, 2, 3])("bumper direction %i stops its front and reflects its back", (dir) => {
-    const vectors = [[0, -1], [1, 0], [0, 1], [-1, 0]] as const;
-    const vector = vectors[dir];
-    if (!vector) throw new Error("missing direction");
-    const [dx, dy] = vector;
+  it.each([0, 1, 2, 3])("bumper direction %i bounces the ship off its padded face", (dir) => {
+    const [dx, dy] = [[0, -1], [1, 0], [0, 1], [-1, 0]][dir]!;
     const { g, d } = build(0, [[3, 3, "comms", dir]]);
-    expect(step(g, d, LEVELS[0]!, [3 + dx, 3 + dy], [-dx, -dy]).vel).toEqual([0, 0]);
-    const bounced = step(g, d, LEVELS[0]!, [3 - dx, 3 - dy], [dx, dy]);
-    expect(bounced.ship).toEqual([3 - dx, 3 - dy]);
-    expect(bounced.vel).toEqual([-dx || 0, -dy || 0]);
+    const bounced = step(g, d, LEVELS[0]!, [3 + dx!, 3 + dy!], [-dx! || 0, -dy! || 0]);
+    expect(bounced.ship).toEqual([3 + dx!, 3 + dy!]);
+    expect(bounced.vel).toEqual([dx, dy]);
     expect(bounced.event).toBe("blocked");
+  });
+  it.each([0, 1, 2, 3])("bumper direction %i freezes a ship that hits its back", (dir) => {
+    const [dx, dy] = [[0, -1], [1, 0], [0, 1], [-1, 0]][dir]!;
+    const { g, d } = build(0, [[3, 3, "comms", dir]]);
+    const r = step(g, d, LEVELS[0]!, [3 - dx!, 3 - dy!], [dx!, dy!]);
+    expect(r.event).toBe("stalled");
+    expect(r.ship).toEqual([3 - dx!, 3 - dy!]);
+  });
+  it("a ship jammed on a bumper's side stays put instead of falling", () => {
+    const { g, d } = build(0, [[3, 4, "comms", 1]]);
+    let ship: [number, number] = [3, 3], vel: [number, number] = [0, 0];
+    for (let i = 0; i < 3; i++) {
+      const r = step(g, d, LEVELS[0]!, ship, [0, 0]);
+      expect(r.event).toBe("stalled");
+      ship = r.ship; vel = r.vel;
+      const again = step(g, d, LEVELS[0]!, ship, vel);
+      expect(again.event).toBe("stalled");
+      expect(again.ship).toEqual([3, 3]);
+    }
   });
   it("a still ship falls into the black hole", () => {
     const { g, d } = build(2, []);
@@ -85,7 +100,7 @@ describe("drift rules", () => {
     });
   });
   it("recorded solutions cost exactly the cheapest the solver found", () => {
-    expect(SOLUTIONS.map(costOf)).toEqual([2, 3, 3, 3, 6]);
+    expect(SOLUTIONS.map(costOf)).toEqual([2, 4, 3, 3, 6]);
   });
   it("a thruster clipped onto a bumper turns it one step clockwise", () => {
     const { g, d } = build(0, [[3, 3, "comms", 0], [4, 3, "thruster", 1]]);
