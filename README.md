@@ -79,6 +79,10 @@ Project Escape is a space-themed puzzle game collaboratively conceptualized and 
 
 ### Installation
 
+### Installation
+
+Clone the repository and install the dependencies:
+
 ```bash
 git clone https://github.com/Shravanp7/project_escape-8c1a610a.git
 cd project_escape-8c1a610a
