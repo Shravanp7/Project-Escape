@@ -111,7 +111,8 @@ function Game() {
   useEffect(() => {
     const slot = boardSlot.current;
     if (!slot) return;
-    const fit = () => slot.style.setProperty("--board-max", `${Math.floor(slot.clientHeight)}px`);
+    const host = slot.closest<HTMLElement>(".fit-grid") ?? slot;
+    const fit = () => host.style.setProperty("--board-max", `${Math.floor(slot.clientHeight)}px`);
     const ro = new ResizeObserver(fit);
     ro.observe(slot);
     fit();
