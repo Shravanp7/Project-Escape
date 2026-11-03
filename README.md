@@ -86,15 +86,19 @@ git clone https://github.com/Shravanp7/project_escape-8c1a610a.git
 cd project_escape-8c1a610a
 npm install
 npm run dev
+```
 
-This makes the commands readable and lets someone copy them into their terminal.
+Open the local URL displayed in your terminal.
 
-### 2. Check the test command
+## 🧪 Testing
 
-Your README says:
+Run the tests using:
 
 ```bash
 bunx vitest run
+```
+
+Use this command only if you've confirmed it works in your project.
 
 ## 🎨 Visual Design
 
@@ -105,4 +109,3 @@ Visual effects use small canvases scaled up to create a pixelated aesthetic.
 Created by **Shravan Patil and Anshul Patil** for **Pixathon**, with the theme *“Any puzzle, your rules.”*
 
 Built with [Lovable](https://lovable.dev).
-
