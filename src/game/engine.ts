@@ -115,7 +115,7 @@ export function simulate(g: Cell[][], dirs: number[][], level: Level, max = 60) 
   for (let i = 0; i < max; i++) {
     const r = step(g, d, level, s, v);
     if (r.event === "portal" || r.event === "blackhole" || r.event === "overload") return r.event;
-    if (r.event === "held") return "stuck";
+    if (r.event === "held" || r.event === "stalled") return "stuck";
     s = r.ship; v = r.vel;
     d = spinAttached(g, d);
   }
