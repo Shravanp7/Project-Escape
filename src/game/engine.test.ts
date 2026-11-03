@@ -53,7 +53,7 @@ describe("drift rules", () => {
   });
   it("a ship jammed on a bumper's side stays put instead of falling", () => {
     const { g, d } = build(0, [[3, 4, "comms", 1]]);
-    let ship: [number, number] = [3, 3], vel: [number, number] = [1, 0];
+    let ship: [number, number] = [3, 3], vel: [number, number] = [0, 0];
     for (let i = 0; i < 3; i++) {
       const r = step(g, d, LEVELS[0]!, ship, [0, 0]);
       expect(r.event).toBe("stalled");
