@@ -111,10 +111,16 @@ function Game() {
   useEffect(() => {
     const slot = boardSlot.current;
     if (!slot) return;
-    const host = slot.closest<HTMLElement>(".fit-grid") ?? slot;
-    const fit = () => host.style.setProperty("--board-max", `${Math.floor(slot.clientHeight)}px`);
+    const host = slot.closest<HTMLElement>(".fit-grid");
+    if (!host) return;
+    // board height = grid row minus the clock row and launch row; measured on resize only so the board never jumps mid-flight
+    const fit = () => {
+      const top = host.querySelector<HTMLElement>(".fit-board-top")?.offsetHeight ?? 0;
+      const controls = host.querySelector<HTMLElement>(".fit-controls")?.offsetHeight ?? 0;
+      host.style.setProperty("--board-max", `${Math.max(160, Math.floor(host.clientHeight - top - controls - 20))}px`);
+    };
     const ro = new ResizeObserver(fit);
-    ro.observe(slot);
+    ro.observe(host);
     fit();
     return () => ro.disconnect();
   }, []);
@@ -530,14 +536,14 @@ function Game() {
               />
             </div>
             </div>
-            <div className="mt-3 flex w-full gap-2">
+            <div className="fit-controls mt-3 flex w-full gap-2">
               {!flying && !won && (
                 <Button variant="pixel" onClick={launch} className="pixel-btn pixel-btn-active flex-1 font-pixel text-sm">▶ LAUNCH</Button>
               )}
               {flying && <p className="flex-1 text-center text-lg text-accent">Ship is moving — you can still place modules.</p>}
               <Button variant="pixel" disabled={locked} onClick={() => loadLevel(li)} className="pixel-btn">Restart</Button>
             </div>
-            <p className="mt-2 text-center text-lg text-muted-foreground">Yellow dots show the ship’s path · Click any module to turn it · Right-click a module to remove it</p>
+            <p className="mt-2 md:hidden text-center text-lg text-muted-foreground">Yellow dots show the ship’s path · Click any module to turn it · Right-click a module to remove it</p>
           </div>
 
           <aside className="fit-panel pixel-panel float-in order-3">
@@ -556,6 +562,7 @@ function Game() {
             </ol>
           </aside>
         </div>
+        <p className="fit-hint mt-3 hidden md:block text-center text-lg text-muted-foreground">Yellow dots show the ship’s path · Click any module to turn it · Right-click a module to remove it</p>
         <footer className="fit-footer relative mt-10 text-center text-lg text-muted-foreground">Made by Shravan Patil and Anshul Patil</footer>
       </div>
       {won && li < LEVELS.length - 1 && <p className="warp-banner font-pixel">SECTOR CLEAR · WARPING…</p>}

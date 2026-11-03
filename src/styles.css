@@ -289,9 +289,9 @@
   .fit-panel ol > li + li { margin-top: .15rem; }
   .board-column { height: 100%; min-height: 0; }
   .fit-board-top > div { margin-bottom: .5rem; }
-  .board-slot { flex: 1 1 0; min-height: 0; }
+  .board-slot { flex: 0 0 auto; }
   .board-column .board-wrap { width: min(100%, var(--board-max, 60vh), 788px); }
-  .board-column > div.mt-3 { margin-top: .5rem; }
-  .board-column > p.mt-2 { margin-top: .3rem; }
+  .fit-controls { margin-top: .5rem; }
+  .fit-hint { margin-top: .3rem; }
   .fit-footer { margin-top: .35rem; }
 }
