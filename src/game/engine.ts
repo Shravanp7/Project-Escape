@@ -34,13 +34,13 @@ export interface Level {
 
 // Every level is checked by a solver (engine.test.ts): budget must cover the cheapest solution.
 // Coins start at 6 and grow by 4 per mission; the clock starts at 30s and grows by 20s per mission.
-// Cheapest solver-found solutions cost 2 / 3 / 3 / 3 / 6 coins (thrusters fire with flame away; bumpers bounce only off the pad; wrong-facing anchors shove).
+// Cheapest solver-found solutions cost 3 / 8 / 8 / 8 / 9 coins (2 modules on Training, 3 on every later mission) (thrusters fire with flame away; bumpers bounce only off the pad; wrong-facing anchors shove).
 export const LEVELS: Level[] = [
-  { name: "Training", brief: "Put a thruster on the left of the ship, then press Launch.", budget: 6, time: 30, ship: [1, 2], portal: [5, 2], rocks: [] },
-  { name: "Cold Start", brief: "Only one route works. Plan your burns.", budget: 10, time: 50, ship: [5, 2], portal: [1, 3], rocks: [[0, 5], [1, 0], [6, 4], [4, 0], [5, 3]] },
-  { name: "Ricochet", brief: "Two burns. Timing is everything.", budget: 14, time: 70, ship: [2, 4], portal: [5, 3], rocks: [[5, 2], [3, 1], [6, 1], [2, 2]] },
-  { name: "High Orbit", brief: "Climb against the pull, then cross the void.", budget: 18, time: 90, ship: [1, 3], portal: [5, 0], rocks: [[6, 4], [0, 3], [1, 5], [4, 3]] },
-  { name: "Gravity Well", brief: "Three burns, one solution. Think ahead.", budget: 22, time: 110, ship: [4, 4], portal: [0, 2], rocks: [[3, 2], [2, 4], [0, 1], [5, 3], [1, 5]] },
+  { name: "Training", brief: "One push is not enough. Find the bounce.", budget: 6, time: 30, ship: [5, 2], portal: [3, 4], rocks: [[6, 4], [6, 1], [5, 1]] },
+  { name: "Cold Start", brief: "Three modules, one route. Plan every move.", budget: 10, time: 50, ship: [0, 1], portal: [5, 5], rocks: [[0, 4], [0, 0], [5, 0], [5, 2]] },
+  { name: "Ricochet", brief: "The portal hides behind the rocks. Go around.", budget: 14, time: 70, ship: [0, 3], portal: [5, 4], rocks: [[5, 2], [5, 3], [6, 2], [0, 0]] },
+  { name: "High Orbit", brief: "Climb against the pull, then cross the void.", budget: 18, time: 90, ship: [6, 1], portal: [1, 3], rocks: [[5, 2], [6, 3], [1, 0], [0, 4], [1, 1]] },
+  { name: "Gravity Well", brief: "Walk the ship along the edge of the abyss.", budget: 22, time: 110, ship: [6, 3], portal: [3, 3], rocks: [[3, 4], [3, 1], [2, 2], [0, 0]] },
 ];
 
 export function makeGrid(level: Level): Cell[][] {
