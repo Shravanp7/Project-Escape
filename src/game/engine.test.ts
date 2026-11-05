@@ -77,8 +77,8 @@ describe("drift rules", () => {
     expect(simulate(g, d, LEVELS[0]!)).toBe("stuck");
   });
   it("three modules touching the ship overload it", () => {
-    const { g, d } = build(1, [[6, 2, "comms", 1], [4, 2, "comms", 1], [5, 1, "comms", 1]]);
-    expect(simulate(g, d, LEVELS[1]!)).toBe("overload");
+    const { g, d } = build(0, [[6, 2, "comms", 1], [4, 2, "comms", 1], [5, 3, "comms", 1]]);
+    expect(simulate(g, d, LEVELS[0]!)).toBe("overload");
   });
   it("coins start at 6 and grow by 4 each mission", () => {
     expect(LEVELS.map((level) => level.budget)).toEqual([6, 10, 14, 18, 22]);
