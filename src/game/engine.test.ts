@@ -10,11 +10,11 @@ const build = (li: number, mods: Mod[]) => {
 
 /** Solver-verified cheapest solutions (brute force over every placement). */
 const SOLUTIONS: Mod[][] = [
-  [[0, 2, "thruster", 3]],
-  [[0, 2, "comms", 1], [6, 2, "thruster", 1]],
-  [[1, 3, "thruster", 3], [2, 5, "comms", 1]],
-  [[0, 0, "thruster", 3], [1, 4, "comms", 1]],
-  [[4, 5, "comms", 1], [5, 0, "thruster", 1], [0, 0, "comms", 1], [2, 2, "thruster", 1]],
+  [[6, 2, "thruster", 1], [2, 2, "comms", 1]],
+  [[0, 2, "shield", 1], [1, 0, "shield", 1], [1, 5, "thruster", 3]],
+  [[0, 2, "shield", 1], [0, 5, "thruster", 3], [6, 5, "shield", 0]],
+  [[6, 2, "shield", 3], [5, 0, "shield", 3], [5, 3, "thruster", 1]],
+  [[6, 4, "shield", 3], [5, 4, "shield", 3], [4, 4, "shield", 3]],
 ];
 const costOf = (mods: Mod[]) => mods.reduce((s, m) => s + MODS[m[2] as ModType].cost, 0);
 
@@ -94,7 +94,7 @@ describe("drift rules", () => {
     });
   });
   it("recorded solutions cost exactly the cheapest the solver found", () => {
-    expect(SOLUTIONS.map(costOf)).toEqual([2, 3, 3, 3, 6]);
+    expect(SOLUTIONS.map(costOf)).toEqual([3, 8, 8, 8, 9]);
   });
   it("a thruster clipped onto a bumper turns it one step clockwise", () => {
     const { g, d } = build(0, [[3, 3, "comms", 0], [4, 3, "thruster", 1]]);
