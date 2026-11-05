@@ -31,7 +31,7 @@ Play directly in your browser — no installation required.
 |---|---|
 | **Thruster** | Touching the ship with its flame pointing away, it pushes the ship forward. Facing any other way, the ship freezes in place. |
 | **Anchor** | Glowing face toward the ship: holds it still. Facing any other way: shoves the ship one square the way it points. |
-| **Bumper** | Bounces the ship back off its padded face. If the ship hits any other side, it freezes in place until the bumper is turned. |
+| **Bumper** | Stops the ship on its padded side and reflects it from other sides. |
 
 ## 💥 How You Lose
 

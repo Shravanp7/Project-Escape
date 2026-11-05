@@ -15,7 +15,7 @@ export const DIR_NAMES = ["UP", "RIGHT", "DOWN", "LEFT"];
 export const MODS: Record<ModType, { name: string; cost: number; desc: string }> = {
   thruster: { name: "Thruster", cost: 2, desc: "Touching the ship with its flame pointing away, it pushes the ship forward. Facing any other way, the ship can't move at all. Click it to turn it." },
   shield: { name: "Anchor", cost: 3, desc: "Glowing face toward the ship: it holds the ship still. Facing any other way, it shoves the ship one square the way it points." },
-  comms: { name: "Bumper", cost: 1, desc: "Its padded face bounces the ship back. If the ship hits any other side, it can't move at all until you turn the bumper." },
+  comms: { name: "Bumper", cost: 1, desc: "The padded face stops the ship; the other sides bounce it back." },
 };
 
 export const SIZE = 7;
@@ -113,11 +113,9 @@ export function step(g: Cell[][], dirs: number[][], level: Level, ship: Vec, vel
   if (ny >= HORIZON_Y && nx >= 0 && nx < SIZE) return { ship: [nx, ny], vel: v, event: "blackhole" };
   // A shove that runs into anything (wall, rock, module) just jams the ship against it.
   if (shoved && (nx < 0 || nx >= SIZE || ny < 0 || g[ny]?.[nx])) return { ship, vel: [0, 0], event: "stalled" };
-  // 6. Bumpers: hitting the padded face bounces the ship straight back. Hitting any other side jams it:
-  //    the ship keeps pressing into the bumper (so the black hole can't pull it) until the pad is turned to face it.
-  if (g[ny]?.[nx] === "comms") {
-    if (facesShip(dirs, nx, ny, ship)) return { ship, vel: [-v[0] || 0, -v[1] || 0], event: "blocked" };
-    return { ship, vel: v, event: "stalled" };
+  // 6. Bumpers: the padded face stops the ship; the other sides bounce it straight back.
+  if (g[ny]?.[nx] === "comms" && !facesShip(dirs, nx, ny, ship)) {
+    return { ship, vel: [-v[0] || 0, -v[1] || 0], event: "blocked" };
   }
   if (nx < 0 || nx >= SIZE || ny < 0 || g[ny]?.[nx]) return { ship, vel: [0, 0], event: "blocked" };
   return { ship: [nx, ny], vel: shoved ? [0, 0] : v, event: "move" };
@@ -136,5 +134,5 @@ export function simulate(g: Cell[][], dirs: number[][], level: Level, max = 60) 
   return "stuck";
 }
 
-/** Removing restores the full purchase cost; rotating is free. */
-export const refund = (m: ModType) => MODS[m].cost;
+/** Removing credits back half the purchase cost; rotating is free. */
+export const refund = (m: ModType) => MODS[m].cost / 2;
