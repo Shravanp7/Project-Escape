@@ -73,7 +73,7 @@ describe("drift rules", () => {
     expect(r.vel).toEqual([0, 0]);
   });
   it("a wrongly facing thruster stops the black hole pulling the ship down", () => {
-    const { g, d } = build(0, [[0, 2, "thruster", 0]]);
+    const { g, d } = build(0, [[4, 2, "thruster", 0]]);
     expect(simulate(g, d, LEVELS[0]!)).toBe("stuck");
   });
   it("three modules touching the ship overload it", () => {
