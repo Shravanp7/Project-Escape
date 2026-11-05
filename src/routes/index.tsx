@@ -72,7 +72,12 @@ function predict(g: Cell[][], dirs: number[][], li: number, ship: Vec, vel: Vec)
   let s = ship, v = vel, d = dirs;
   for (let i = 0; i < 16; i++) {
     const r = step(g, d, level, s, v);
-    if (r.event === "held" || r.event === "stalled") break;
+    if (r.event === "held") break;
+    if (r.event === "stalled") {
+      // a wrongly facing module: show the path straight down to the black hole
+      for (let y = s[1] + 1; y <= HORIZON_Y; y++) path.push([s[0], y]);
+      break;
+    }
     path.push(r.ship);
     if (r.event !== "move" && r.event !== "blocked") break;
     s = r.ship; v = r.vel;
@@ -581,7 +586,7 @@ function Game() {
             <ol className="space-y-1 text-xl text-muted-foreground">
               <li>1. Get the ship into the spinning portal.</li>
               <li>2. A thruster touching the ship pushes it forward only when its flame points away from the ship. Facing any other way, it jams the ship in place (flashing red) until you turn it.</li>
-              <li>3. An anchor facing the ship holds it still; facing any other way, it shoves the ship one square the way it points. A bumper's padded face bounces the ship back; if the ship hits any other side, it jams in place (flashing red) until you turn the bumper.</li>
+              <li>3. An anchor facing the ship holds it still; facing any other way, it shoves the ship one square the way it points. Bumper fronts stop; their backs and sides bounce.</li>
               <li>4. No friction: once moving, the ship glides until it hits something.</li>
               <li>5. When the ship stops, the black hole pulls it down one square at a time.</li>
               <li>6. If it falls into the purple bottom row, it's gone.</li>
