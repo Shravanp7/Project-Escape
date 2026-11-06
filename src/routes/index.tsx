@@ -588,10 +588,9 @@ function Game() {
               <li>2. A thruster touching the ship pushes it forward only when its flame points away from the ship. Facing any other way, it jams the ship in place (flashing red) until you turn it.</li>
               <li>3. An anchor facing the ship holds it still; facing any other way, it shoves the ship one square the way it points. Bumper fronts stop; their backs and sides bounce.</li>
               <li>4. No friction: once moving, the ship glides until it hits something.</li>
-              <li>5. When the ship stops, the black hole pulls it down one square at a time.</li>
-              <li>6. If it falls into the purple bottom row, it's gone.</li>
-              <li>7. Three modules touching the ship at once will overload it.</li>
-              {!sandbox && <li>8. Running out of credits (¢) or time also loses the level.</li>}
+              <li>5. If it falls into the purple bottom row, it's gone.</li>
+              <li>6. Three modules touching the ship at once will overload it.</li>
+              {!sandbox && <li>7. Running out of time also loses the level.</li>}
             </ol>
           </aside>
         </div>
