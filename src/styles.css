@@ -189,7 +189,7 @@
 .pixel-btn-active { border-color: var(--primary); color: var(--primary); background: oklch(0.88 0.14 200 / 0.12); }
 .pixel-btn:disabled { opacity: .5; cursor: not-allowed; }
 .board-column { min-width: 0; width: 100%; }
-.board-column .board-wrap { width: min(100%, 74vh, 788px); }
+.board-column .board-wrap { width: min(100%, 82vh, 920px); }
 .board-column canvas { width: 100%; }
 .exit-portal { width: 80px; height: 80px; border: 6px dashed var(--primary); border-radius: 50%; box-shadow: 0 0 24px var(--primary); animation: spin 9s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .exit-portal { animation: none; } }
@@ -241,7 +241,34 @@
 @keyframes startOut { to { opacity: 0; transform: translateY(-40px); } }
 .blink { animation: danger 1s steps(2) infinite; }
 .start-card { max-width: 20rem; margin-top: 1.6rem; padding: 1.2rem 1.3rem; background: oklch(0.13 0.035 270 / 0.92); border: 2px solid var(--border); box-shadow: 6px 6px 0 oklch(0 0 0 / 0.45); }
-.goal-line { border: 2px dashed var(--border); padding: .4rem .8rem; background: var(--card); }
+/* GOAL line: no box, no border — yellow label and white text directly on space */
+.goal-line { padding: .2rem .5rem; }
+.goal-line .goal-tag { color: var(--accent); text-shadow: 0 0 10px oklch(0.82 0.15 70 / 0.5); }
+
+/* level select: cyan idle, yellow for the current sector */
+.level-btn { color: var(--primary); }
+.level-btn:hover:not(:disabled) { border-color: var(--primary); box-shadow: 3px 3px 0 var(--background), 0 0 12px oklch(0.88 0.14 200 / 0.35); }
+.level-btn-active { border-color: var(--accent); color: var(--accent); background: oklch(0.82 0.15 70 / 0.12); box-shadow: 3px 3px 0 var(--background), 0 0 14px oklch(0.82 0.15 70 / 0.3); }
+
+/* launch: the primary arcade action */
+.launch-btn { border-color: var(--primary); color: var(--primary-foreground);
+  background: linear-gradient(180deg, oklch(0.88 0.14 200), oklch(0.7 0.15 215));
+  box-shadow: 3px 3px 0 var(--background), 0 0 18px oklch(0.88 0.14 200 / 0.45);
+  text-shadow: 1px 1px 0 oklch(0.15 0.03 270 / 0.6); }
+.launch-btn:hover { transform: translate(-1px, -1px); border-color: var(--primary);
+  box-shadow: 4px 4px 0 var(--background), 0 0 26px oklch(0.88 0.14 200 / 0.6); }
+.launch-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+
+/* title: subtle neon glow over the pixel shadow */
+.title-glow { text-shadow: 2px 2px var(--background), 0 0 22px oklch(0.88 0.14 200 / 0.45); }
+
+/* mission steps: cyan pixel counters, roomy lines */
+.mission-steps { list-style: none; counter-reset: step; padding: 0; margin: 0; }
+.mission-steps li { counter-increment: step; position: relative; padding-left: 2.1rem; line-height: 1.35; }
+.mission-steps li + li { margin-top: .5rem; }
+.mission-steps li::before { content: counter(step); position: absolute; left: 0; top: .18em;
+  font-family: var(--font-pixel); font-size: .5em; line-height: 1; color: var(--primary);
+  border: 1px solid var(--primary); padding: .3em .4em; box-shadow: 0 0 8px oklch(0.88 0.14 200 / 0.35); }
 .tactical { padding: 14px; background:
   linear-gradient(var(--primary), var(--primary)) top left / 14px 2px no-repeat,
   linear-gradient(var(--primary), var(--primary)) top left / 2px 14px no-repeat,
@@ -280,7 +307,7 @@
   .fit-gap { margin-bottom: .55rem; }
   .fit-gap .pixel-btn { font-size: clamp(13px, 1.3vw, 1.15rem); }
   .fit-grid { --side-min: clamp(220px, 34vw, 320px); flex: 1 1 0; min-height: 0; grid-template-rows: minmax(0, 1fr); gap: 1.25rem;
-    grid-template-columns: minmax(var(--side-min), 1fr) min(var(--board-max, 60vh), calc(100% - 2 * var(--side-min) - 2.5rem), 788px) minmax(var(--side-min), 1fr); }
+    grid-template-columns: minmax(var(--side-min), 1fr) min(var(--board-max, 68vh), calc(100% - 2 * var(--side-min) - 2.5rem), 920px) minmax(var(--side-min), 1fr); }
   .fit-panel { min-height: 0; overflow-y: auto; scrollbar-width: thin; padding: .8rem; }
   .fit-panel .text-xl { font-size: calc(1.25rem * var(--fs, 1)); line-height: 1.3; }
   .fit-panel .text-lg { font-size: calc(1.125rem * var(--fs, 1)); line-height: 1.25; }
@@ -290,7 +317,7 @@
   .fit-panel ol > li + li { margin-top: .15rem; }
   .board-column { height: 100%; min-height: 0; }
   .fit-board-top > div { margin-bottom: .5rem; }
-  .board-column .board-wrap { width: min(100%, var(--board-max, 60vh), 788px); }
+  .board-column .board-wrap { width: min(100%, var(--board-max, 68vh), 920px); }
   .fit-controls { margin-top: .5rem; }
   .fit-controls .font-pixel { white-space: nowrap; }
   .fit-hint { margin-top: .3rem; }

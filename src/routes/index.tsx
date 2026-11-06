@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Starfield } from "@/game/Starfield";
 import { Button } from "@/components/ui/button";
-import { RotateCw, ArrowUp, ArrowRight, ArrowDown, ArrowLeft } from "lucide-react";
+import { RotateCw, ArrowUp, ArrowRight, ArrowDown, ArrowLeft, Play } from "lucide-react";
 import { drawDirectionalCell, drawCell } from "@/game/sprites";
 import { DIRS, DIR_NAMES, HORIZON_Y, LEVELS, MODS, SIZE, facesShip, thrusterPushes, makeDirs, makeGrid, refund, spinAttached, step, type Cell, type ModType, type Vec } from "@/game/engine";
 import { StartScreen } from "@/game/StartScreen";
@@ -490,16 +490,16 @@ function Game() {
       >
         <Starfield />
         <header className="fit-header mb-3 text-center">
-          <h1 className="title-glitch font-pixel text-xl text-primary md:text-3xl">PROJECT ESCAPE</h1>
+          <h1 className="title-glow font-pixel text-xl text-primary md:text-3xl">PROJECT ESCAPE</h1>
           <p className="mt-2 text-xl text-muted-foreground">Your ship has no brakes. The black hole is hungry. Steer it home.</p>
         </header>
 
         <p className="goal-line fit-gap mx-auto mb-4 max-w-2xl text-center text-xl">
-          <span className="font-pixel text-base text-accent">GOAL:</span>{" "}Fly the ship into the portal before the black hole takes it.
+          <span className="goal-tag font-pixel text-base">GOAL:</span>{" "}Fly the ship into the portal before the black hole takes it.
         </p>
         <div className="fit-gap mb-4 flex flex-wrap justify-center gap-2">
           {LEVELS.map((l, i) => (
-            <Button variant="pixel" key={l.name} disabled={locked || i > unlocked} onClick={() => loadLevel(i)} className={`pixel-btn ${i === li ? "pixel-btn-active" : ""}`}>
+            <Button variant="pixel" key={l.name} disabled={locked || i > unlocked} onClick={() => loadLevel(i)} className={`pixel-btn level-btn ${i === li ? "level-btn-active" : ""}`}>
               {i + 1}. {l.name}{i > unlocked ? " · LOCKED" : ""}
             </Button>
           ))}
@@ -548,7 +548,7 @@ function Game() {
                 ref={canvas}
                 width={SIZE * TILE}
                 height={SIZE * TILE}
-                className="pixel-canvas pixel-frame w-[min(92vw,74vh,760px)] cursor-crosshair"
+                className="pixel-canvas pixel-frame w-[min(94vw,82vh,920px)] cursor-crosshair"
                 onMouseMove={(e) => (hover.current = cellAt(e))}
                 onMouseLeave={() => (hover.current = null)}
                 onClick={(e) => place(...cellAt(e))}
@@ -571,7 +571,7 @@ function Game() {
             </div>
             <div className="fit-controls mt-3 flex w-full gap-2">
               {!flying && !won && (
-                <Button variant="pixel" onClick={launch} className="pixel-btn pixel-btn-active flex-1 font-pixel text-sm">▶ LAUNCH</Button>
+                <Button variant="pixel" onClick={launch} className="pixel-btn launch-btn flex-1 font-pixel text-sm"><Play className="fill-current" /> LAUNCH</Button>
               )}
               {flying && <p className="flex-1 text-center text-lg text-accent">Ship is moving — you can still place modules.</p>}
               <Button variant="pixel" disabled={locked} onClick={() => loadLevel(li)} className="pixel-btn">Restart</Button>
@@ -583,14 +583,14 @@ function Game() {
             <h2 className="font-pixel mb-2 text-sm text-accent">MISSION</h2>
             <p className="text-xl">{level.brief}</p>
             <h2 className="font-pixel mb-2 mt-4 text-sm text-accent">HOW IT WORKS</h2>
-            <ol className="space-y-1 text-xl text-muted-foreground">
-              <li>1. Get the ship into the spinning portal.</li>
-              <li>2. A thruster touching the ship pushes it forward only when its flame points away from the ship. Facing any other way, it jams the ship in place (flashing red) until you turn it.</li>
-              <li>3. An anchor facing the ship holds it still; facing any other way, it shoves the ship one square the way it points. Bumper fronts stop; their backs and sides bounce.</li>
-              <li>4. No friction: once moving, the ship glides until it hits something.</li>
-              <li>5. If it falls into the purple bottom row, it's gone.</li>
-              <li>6. Three modules touching the ship at once will overload it.</li>
-              {!sandbox && <li>7. Running out of time also loses the level.</li>}
+            <ol className="mission-steps text-xl text-muted-foreground">
+              <li>Get the ship into the spinning portal.</li>
+              <li>A thruster touching the ship pushes it forward only when its flame points away from the ship. Facing any other way, it jams the ship in place (flashing red) until you turn it.</li>
+              <li>An anchor facing the ship holds it still; facing any other way, it shoves the ship one square the way it points. Bumper fronts stop; their backs and sides bounce.</li>
+              <li>No friction: once moving, the ship glides until it hits something.</li>
+              <li>If it falls into the purple bottom row, it's gone.</li>
+              <li>Three modules touching the ship at once will overload it.</li>
+              {!sandbox && <li>Running out of time also loses the level.</li>}
             </ol>
           </aside>
         </div>
