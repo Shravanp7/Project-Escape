@@ -2,14 +2,18 @@ import { useEffect, useRef } from "react";
 
 const W = 320, H = 180;
 
-export function Starfield() {
+export function Starfield({ victory = false }: { victory?: boolean } = {}) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    const c = ref.current!.getContext("2d")!;
-    const stars = Array.from({ length: 140 }, () => ({
+    const c = ref.current?.getContext("2d");
+    if (!c) return;
+    const theme = getComputedStyle(document.documentElement);
+    const detailColors = ["--primary", "--accent", "--muted-foreground", "--success"].map((token) => theme.getPropertyValue(token).trim());
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const stars = Array.from({ length: victory ? 240 : 140 }, () => ({
       x: Math.random() * W, y: Math.random() * H, z: 1 + Math.floor(Math.random() * 3),
     }));
-    const rocks = Array.from({ length: 4 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: 2 + Math.random() * 3, v: 0.1 + Math.random() * 0.2 }));
+    const rocks = Array.from({ length: victory ? 7 : 4 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: 2 + Math.random() * 3, v: 0.1 + Math.random() * 0.2 }));
     const comets = Array.from({ length: 3 }, () => ({ x: 0, y: 0, vx: 0, vy: 0, life: 0, hue: 0 }));
     let raf = 0;
     const loop = (t: number) => {
@@ -40,11 +44,39 @@ export function Starfield() {
           c.fillStyle = `rgb(${Math.floor(60 + step * 190)},${Math.floor(30 + step * 110)},${Math.floor(50 + step * 60)})`;
           c.fillRect(cx + x, cy + y, 2, 2);
         }
+      if (victory) {
+        // Distant, stepped pixel planets stay outside the central victory copy.
+        for (const [index, planet] of [[38, 34, 4], [285, 26, 3], [48, 139, 3]].entries()) {
+          const [px = 0, py = 0, radius = 3] = planet;
+          c.fillStyle = detailColors[index] ?? "";
+          c.globalAlpha = 0.45;
+          for (let y = -radius; y <= radius; y++) {
+            const half = Math.floor(Math.sqrt(radius * radius - y * y));
+            c.fillRect(px - half, py + y, half * 2 + 1, 1);
+          }
+          c.globalAlpha = 0.2;
+          c.fillStyle = detailColors[2] ?? "";
+          c.fillRect(px - radius + 1, py - 1, radius * 2 - 1, 1);
+          c.globalAlpha = 1;
+        }
+        // A few tiny cross-shaped stars in the quieter corners.
+        for (const [index, point] of [[25, 65], [291, 72], [67, 158], [252, 14], [15, 119]].entries()) {
+          const [x = 0, y = 0] = point;
+          c.fillStyle = detailColors[index % detailColors.length] ?? "";
+          c.globalAlpha = 0.3 + (Math.sin(t / 1600 + index * 2) + 1) * 0.15;
+          c.fillRect(x - 1, y, 3, 1); c.fillRect(x, y - 1, 1, 3);
+        }
+        c.globalAlpha = 1;
+      }
       for (const a of rocks) {
         a.x -= a.v;
         if (a.x < -6) { a.x = W + 6; a.y = Math.random() * H; }
         c.fillStyle = "#4a3c36";
-        c.fillRect(Math.floor(a.x), Math.floor(a.y), Math.ceil(a.s), Math.ceil(a.s));
+        if (victory) {
+          const size = Math.ceil(a.s);
+          c.fillRect(Math.floor(a.x) + 1, Math.floor(a.y), size - 1, size);
+          c.fillRect(Math.floor(a.x), Math.floor(a.y) + 1, size + 1, Math.max(1, size - 2));
+        } else c.fillRect(Math.floor(a.x), Math.floor(a.y), Math.ceil(a.s), Math.ceil(a.s));
         c.fillStyle = "#7a665a";
         c.fillRect(Math.floor(a.x), Math.floor(a.y), 1, 1);
       }
@@ -65,10 +97,10 @@ export function Starfield() {
         c.fillStyle = "rgba(255,255,255,0.35)"; c.fillRect(Math.floor(k.x) - 1, Math.floor(k.y) - 1, 3, 3);
         c.fillStyle = "#ffffff"; c.fillRect(Math.floor(k.x), Math.floor(k.y), 1, 1);
       }
-      raf = requestAnimationFrame(loop);
+      if (!victory || !reducedMotion.matches) raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [victory]);
   return <canvas ref={ref} width={W} height={H} className="pixel-canvas fixed inset-0 -z-10 h-full w-full object-cover" />;
 }
