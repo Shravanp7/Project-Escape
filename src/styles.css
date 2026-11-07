@@ -236,7 +236,7 @@
 :root { --hole: oklch(0.05 0.02 300); --hole-glow: oklch(0.7 0.25 320); }
 @theme inline { --color-hole-glow: var(--hole-glow); }
 
-.title-glitch { text-shadow: 2px 2px var(--background); }
+.title-glitch { text-shadow: 2px 2px var(--background), 0 0 18px oklch(0.88 0.14 200 / 0.55), 0 0 42px oklch(0.88 0.14 200 / 0.25); }
 @keyframes glitch { 0%,92%,100% { transform: none; } 93% { transform: translate(2px,-1px) skewX(8deg); } 96% { transform: translate(-2px,1px); } }
 .float-in { animation: floatIn 600ms steps(6) both; }
 @keyframes floatIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
@@ -279,7 +279,11 @@
 .start-ui-out { animation: startOut 600ms steps(6) forwards; }
 @keyframes startOut { to { opacity: 0; transform: translateY(-40px); } }
 .blink { animation: danger 1s steps(2) infinite; }
-.start-card { max-width: 20rem; margin-top: 1.6rem; padding: 1.2rem 1.3rem; background: oklch(0.13 0.035 270 / 0.92); border: 2px solid var(--border); box-shadow: 6px 6px 0 oklch(0 0 0 / 0.45); }
+.start-launch { color: var(--accent); text-shadow: 0 0 12px oklch(0.82 0.15 70 / 0.6), 0 0 28px oklch(0.82 0.15 70 / 0.3); }
+.start-card { max-width: 24rem; margin-top: 1.6rem; padding: 1.5rem 1.7rem; background: oklch(0.13 0.035 270 / 0.92); border: 2px solid var(--primary); box-shadow: 6px 6px 0 oklch(0 0 0 / 0.45), 0 0 16px oklch(0.88 0.14 200 / 0.3), inset 0 0 0 1px oklch(0.88 0.14 200 / 0.15); }
+.start-card li { text-align: left; }
+.start-card li::first-letter { color: var(--primary); }
+.credit { text-shadow: 1px 1px 0 var(--background), 0 0 10px oklch(0 0 0 / 0.8); }
 /* GOAL line: no box, no border — yellow label and white text directly on space */
 .goal-line { padding: .2rem .5rem; }
 .goal-line .goal-tag { color: var(--accent); text-shadow: 0 0 10px oklch(0.82 0.15 70 / 0.5); }

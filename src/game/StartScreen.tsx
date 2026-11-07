@@ -49,11 +49,18 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
         const len = launchAt.current ? Math.min(8, 1 + lt * 6 * s.s) : 1;
         px(s.x, s.y, 1, len, s.s > 0.7 ? "#ffffff" : s.s > 0.4 ? "#9fc2ff" : "#3a4a70");
       }
-      // nebula haze (dithered starry lighting)
+      // nebula haze (dithered starry lighting) — purple on the left, blue on the right
       for (let y = 0; y < 70; y += 2) for (let x = (y / 2) % 2 ? 0 : 1; x < W; x += 2) {
-        const d = Math.hypot(x - 40, y - 35) / 40;
         const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5][((y / 2) % 4) * 4 + ((x >> 1) % 4)]! / 16;
-        if (d < 1 && bayer > d) px(x, y, 1, 1, d < 0.5 ? "#2a1450" : "#150a2e");
+        const dl = Math.hypot(x - 40, y - 35) / 40;
+        if (dl < 1 && bayer > dl) px(x, y, 1, 1, dl < 0.5 ? "#2a1450" : "#150a2e");
+        const dr = Math.hypot(x - 122, y - 42) / 34;
+        if (dr < 1 && bayer > dr) px(x, y, 1, 1, dr < 0.5 ? "#101c4e" : "#0a1230");
+      }
+      // two tiny distant planets
+      for (const [pxx, pyy, r, body, shade] of [[22, 16, 4, "#3a2a6e", "#241a48"], [142, 58, 3, "#1e3a6e", "#122448"]] as const) {
+        for (let y = -r; y <= r; y++) { const half = Math.floor(Math.sqrt(r * r - y * y)); px(pxx - half, pyy + y, half * 2 + 1, 1, y < 0 ? body : shade); }
+        px(pxx - 1, pyy - 1, 2, 1, "#8fb0ff");
       }
       // twinkling bright stars with cross flares
       for (const g of glows) {
@@ -82,6 +89,12 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
       const groundY = 100; // the pad stays put while the ship climbs away from it
       px(0, groundY + shake, W, H, "#1a2130");
       px(0, groundY + shake, W, 1, "#5b6b82");
+      // subtle blue panel lines and glowing cyan strips along the platform
+      for (let x = 0; x < W; x += 16) px(x, groundY + 6 + shake, 8, 1, "#232f45");
+      for (let x = 6; x < W; x += 24) {
+        const glow = (Math.sin(now / 700 + x) + 1) / 2;
+        px(x + shake, groundY + 2 + shake, 6, 1, glow > 0.5 ? "#5ef2ff" : "#2a7a8a");
+      }
       px(3 + shake, groundY - 4 + shake, 22, 4, "#2c3647");
       px(6 + shake, groundY - 26 + shake, 2, 22, "#5b6b82"); // tower
       for (let y = 0; y < 22; y += 4) px(6 + shake, groundY - 26 + y + shake, 5, 1, "#5b6b82");
@@ -131,8 +144,14 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
         px(bx - k - 1, by + k, 2, 2, "#ffb347");
         px(bx + k, by + k, 2, 2, "#fff4d0");
       }
-      // flame only once the engines fire
-      const flame = launchAt.current ? 8 + Math.random() * 10 : 0;
+      // gentle blue glow under the ship, always on
+      const glowA = 0.25 + Math.sin(now / 500) * 0.08;
+      c.fillStyle = `rgba(94,242,255,${glowA})`;
+      c.fillRect(Math.round(rx - 2), Math.round(ry + 27), 10, 1);
+      c.fillStyle = `rgba(94,242,255,${glowA * 0.5})`;
+      c.fillRect(Math.round(rx - 4), Math.round(ry + 28), 14, 1);
+      // flame: soft idle flicker, full blast once the engines fire
+      const flame = launchAt.current ? 8 + Math.random() * 10 : 2 + Math.random() * 2;
       if (flame > 0) {
         px(rx - 1, ry + 25, 8, flame, "#ffb347");
         px(rx + 1, ry + 25, 4, flame * 0.6, "#fff4d0");
@@ -163,13 +182,13 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
         <h1 className="title-glitch font-pixel text-3xl text-primary md:text-6xl">PROJECT ESCAPE</h1>
         <div className="start-card">
           <p className="text-2xl text-foreground">Your ship has no brakes. A black hole wants it. Aim thrusters to fly it home.</p>
-          <ul className="mx-auto mt-5 space-y-1 text-left text-lg text-muted-foreground">
-            <li>▸ Place thrusters, anchors and bumpers on the grid</li>
-            <li>▸ Turn any module to choose its active face</li>
-            <li>▸ Hit Launch and watch the ship drift</li>
-            <li>▸ Reach the portal before the black hole eats you</li>
+          <ul className="mx-auto mt-5 space-y-2 text-left text-lg text-muted-foreground">
+            <li><span className="text-primary">▸</span> Place thrusters, anchors and bumpers on the grid</li>
+            <li><span className="text-primary">▸</span> Turn any module to choose its active face</li>
+            <li><span className="text-primary">▸</span> Hit Launch and watch the ship drift</li>
+            <li><span className="text-primary">▸</span> Reach the portal before the black hole eats you</li>
           </ul>
-          <p className="blink font-pixel mt-8 text-sm text-accent md:text-base">
+          <p className="blink start-launch font-pixel mt-8 text-sm md:text-base">
             <span className="hidden md:inline">PRESS SPACE TO LAUNCH</span>
             <span className="md:hidden">TAP TO LAUNCH</span>
           </p>
