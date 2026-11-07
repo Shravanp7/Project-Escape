@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { RotateCcw, LogOut } from "lucide-react";
 import { Starfield } from "./Starfield";
-import { ARTWORK } from "./artwork";
+import { StationScene } from "./StationScene";
 
 export function ExitScreen({ onReplay, onExit }: { onReplay: () => void; onExit: () => void }) {
   return (
@@ -10,23 +10,15 @@ export function ExitScreen({ onReplay, onExit }: { onReplay: () => void; onExit:
       <div className="relative flex max-w-lg flex-col items-center gap-6">
         <p className="font-pixel text-xs text-accent">GRAVITY WELL CLEARED</p>
         <h1 className="font-pixel text-2xl text-primary md:text-4xl">PROJECT ESCAPE</h1>
-        <div className="exit-orbit relative flex h-28 items-center justify-center gap-5" aria-hidden="true">
-          <span className="victory-ship relative h-16 w-16">
-            <img src={ARTWORK.thruster} className="pixel-canvas h-16 w-16 object-contain" alt="" />
-            <span className="victory-flame" />
-          </span>
-          <span className="relative h-20 w-20">
-            <span className="exit-portal block" />
-            <span className="victory-particles absolute inset-0">
-              {Array.from({ length: 8 }, (_, i) => <i key={i} />)}
-            </span>
-          </span>
+        <div className="relative" aria-hidden="true">
+          <StationScene />
           <span className="victory-sparkles absolute inset-0">
             {Array.from({ length: 6 }, (_, i) => <i key={i} />)}
           </span>
         </div>
-        <h2 className="victory-heading font-pixel text-xl text-success">ESCAPED!</h2>
-        <p className="text-2xl text-foreground">Five sectors behind you. The ship is home.</p>
+        <h2 className="victory-heading font-pixel text-xl text-success">LEVEL COMPLETE!</h2>
+        <p className="font-pixel text-sm text-primary">MISSION ACCOMPLISHED!</p>
+        <p className="text-2xl text-foreground">Five sectors behind you. The ship is finally home.</p>
         <div className="flex flex-wrap justify-center gap-4">
           <Button className="victory-button font-pixel" variant="pixel" onClick={onReplay}><RotateCcw className="fill-current" />PLAY AGAIN</Button>
           <Button className="victory-button font-pixel" variant="pixel" onClick={onExit}><LogOut />EXIT TO LAUNCH</Button>
