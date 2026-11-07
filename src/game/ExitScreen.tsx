@@ -28,8 +28,8 @@ export function ExitScreen({ onReplay, onExit }: { onReplay: () => void; onExit:
         <h2 className="victory-heading font-pixel text-xl text-success">ESCAPED!</h2>
         <p className="text-2xl text-foreground">Five sectors behind you. The ship is home.</p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Button className="victory-button" variant="pixel" onClick={onReplay}><RotateCcw />Play again</Button>
-          <Button className="victory-button" variant="pixel" onClick={onExit}><LogOut />Exit to launch</Button>
+          <Button className="victory-button font-pixel" variant="pixel" onClick={onReplay}><RotateCcw className="fill-current" />PLAY AGAIN</Button>
+          <Button className="victory-button font-pixel" variant="pixel" onClick={onExit}><LogOut />EXIT TO LAUNCH</Button>
         </div>
       </div>
       <p className="absolute bottom-6 px-4 text-lg text-muted-foreground">Made by Shravan Patil and Anshul Patil</p>

@@ -14,7 +14,7 @@ export function Starfield({ victory = false }: { victory?: boolean } = {}) {
       x: Math.random() * W, y: Math.random() * H, z: 1 + Math.floor(Math.random() * 3),
     }));
     const rocks = Array.from({ length: victory ? 7 : 4 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: 2 + Math.random() * 3, v: 0.1 + Math.random() * 0.2 }));
-    const comets = Array.from({ length: 3 }, () => ({ x: 0, y: 0, vx: 0, vy: 0, life: 0, hue: 0 }));
+    const comets = Array.from({ length: victory ? 5 : 3 }, () => ({ x: 0, y: 0, vx: 0, vy: 0, life: 0, hue: 0 }));
     let raf = 0;
     const loop = (t: number) => {
       c.fillStyle = "#070914";

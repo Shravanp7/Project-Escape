@@ -214,9 +214,14 @@
 .victory-sparkles i:nth-child(4) { right: 24px; top: -10px; animation-delay: -2s; }
 .victory-sparkles i:nth-child(5) { left: -44px; bottom: 0; background: var(--accent); animation-delay: -.7s; }
 .victory-sparkles i:nth-child(6) { right: -45px; top: 18px; background: var(--foreground); animation-delay: -3.7s; }
-.victory-button { border-color: var(--primary); box-shadow: inset 2px 2px 0 color-mix(in oklch, var(--primary) 18%, transparent), inset -2px -2px 0 var(--background), 3px 3px 0 var(--background); }
-.victory-button:hover { box-shadow: inset 2px 2px 0 color-mix(in oklch, var(--primary) 30%, transparent), 3px 3px 0 var(--background), 0 0 12px color-mix(in oklch, var(--primary) 25%, transparent); }
-.victory-button:active { box-shadow: inset 2px 2px 0 var(--background); }
+/* victory buttons: same chunky filled arcade look as the main-screen LAUNCH button */
+.victory-button { border-color: var(--primary); color: var(--primary-foreground);
+  background: linear-gradient(180deg, oklch(0.88 0.14 200), oklch(0.7 0.15 215));
+  box-shadow: 3px 3px 0 var(--background), 0 0 18px oklch(0.88 0.14 200 / 0.45);
+  text-shadow: 1px 1px 0 oklch(0.15 0.03 270 / 0.6); }
+.victory-button:hover { transform: translate(-1px, -1px); border-color: var(--primary);
+  box-shadow: 4px 4px 0 var(--background), 0 0 26px oklch(0.88 0.14 200 / 0.6); }
+.victory-button:active { transform: translate(2px, 2px); box-shadow: none; }
 @keyframes victoryGlow { 0%, 100% { text-shadow: 0 0 4px color-mix(in oklch, var(--success) 20%, transparent); } 50% { text-shadow: 0 0 12px color-mix(in oklch, var(--success) 45%, transparent); } }
 @keyframes victoryFlame { 0%, 100% { transform: scaleX(.7); opacity: .35; } 50% { transform: scaleX(1.15); opacity: .65; } }
 @keyframes victoryParticle { 0%, 100% { opacity: .25; transform: translateY(2px); } 50% { opacity: .75; transform: translateY(-3px); } }
