@@ -35,20 +35,20 @@ export function StationScene() {
         c.fillStyle = lit ? (i % 2 ? "#9fd8ff" : "#ffd98a") : "#141a30";
         c.fillRect(62 + i * 7, 38, 4, 5);
       }
-      // docking bay (lower left of the hull)
-      c.fillStyle = "#0d1226"; c.fillRect(30, 52, 26, 14);
+      // docking bay (lower left of the hull), sized around the enlarged crew module
+      c.fillStyle = "#0d1226"; c.fillRect(26, 48, 32, 28);
       c.fillStyle = "#39d7ff";
-      c.fillRect(30, 52, 26, 1); c.fillRect(30, 65, 26, 1); c.fillRect(30, 52, 1, 14); c.fillRect(55, 52, 1, 14);
+      c.fillRect(26, 48, 32, 1); c.fillRect(26, 75, 32, 1); c.fillRect(26, 48, 1, 28); c.fillRect(57, 48, 1, 28);
       // cyan docking lights chasing along the bay
       for (let i = 0; i < 4; i++) {
         c.fillStyle = Math.floor(t / 300 + i) % 2 === 0 ? "#39d7ff" : "#0e3a4a";
-        c.fillRect(32 + i * 6, 50, 2, 2);
+        c.fillRect(29 + i * 8, 46, 2, 2);
       }
-      // the ship, parked in the bay
-      if (!drawArtwork(c, "ship", 33, 53, 20)) {
-        c.fillStyle = "#e8ecf4"; c.fillRect(38, 55, 10, 9);
-        c.fillStyle = "#7fc4ff"; c.fillRect(41, 56, 4, 3);
-        c.fillStyle = "#3a3f52"; c.fillRect(38, 62, 10, 2);
+      // the ship, parked prominently in the bay
+      if (!drawArtwork(c, "ship", 28, 49, 28)) {
+        c.fillStyle = "#e8ecf4"; c.fillRect(35, 53, 14, 17);
+        c.fillStyle = "#7fc4ff"; c.fillRect(39, 55, 6, 5);
+        c.fillStyle = "#3a3f52"; c.fillRect(35, 67, 14, 3);
       }
       // green docking-success indicator
       const greenOn = Math.sin(t / 500) > -0.2;
